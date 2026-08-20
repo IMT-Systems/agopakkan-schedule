@@ -14,6 +14,9 @@ with open(os.path.join(SCRIPT_DIR, "assets", "logo_b64.txt")) as f:
 with open(os.path.join(SCRIPT_DIR, "assets", "avatar_b64.txt")) as f:
     AVATAR_B64 = f.read().strip()
 
+with open(os.path.join(SCRIPT_DIR, "assets", "top_b64.txt")) as f:
+    TOP_LOGO_B64 = f.read().strip()
+
 YEAR, MONTH = 2026, 8
 WEEKDAY_JP = ["日", "月", "火", "水", "木", "金", "土"]
 
@@ -28,7 +31,8 @@ PIN_SVG = (
 def maps_url(query):
     return f"https://www.google.com/maps/search/?api=1&query={quote(query)}"
 
-def day_card_html(day, wd_label, events):
+def day_card_html(day, wd_label, wd_idx, events):
+    num_cls = "sun" if wd_idx == 0 else ("sat" if wd_idx == 6 else "")
     rows = ""
     for e in events:
         link = maps_url(e["maps"]) if e.get("maps") else None
@@ -44,7 +48,7 @@ def day_card_html(day, wd_label, events):
         )
     return (
         f'<div class="day-card">'
-        f'<div class="day-card-head">{day:02d}<span class="wd">({wd_label})</span></div>'
+        f'<div class="day-card-head"><span class="daynum {num_cls}">{day:02d}</span><span class="wd">({wd_label})</span></div>'
         f'<div class="day-card-body">{rows}</div>'
         f'</div>'
     )
@@ -54,8 +58,9 @@ for day in sorted(EVENTS.keys()):
     real_events = [e for e in EVENTS[day] if not e.get("deco_only")]
     if not real_events:
         continue
-    wd_label = WEEKDAY_JP[(datetime.date(YEAR, MONTH, day).weekday() + 1) % 7]
-    schedule_html += day_card_html(day, wd_label, real_events)
+    wd_idx = (datetime.date(YEAR, MONTH, day).weekday() + 1) % 7
+    wd_label = WEEKDAY_JP[wd_idx]
+    schedule_html += day_card_html(day, wd_label, wd_idx, real_events)
 
 if not schedule_html:
     schedule_html = '<div class="empty-state">この月の出店予定はまだありません。</div>'
@@ -81,18 +86,23 @@ html = f"""<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>あごぱっかーん {MONTH}月 出店スケジュール</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Kalam:wght@400;700&family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {{
     --bg: #F3F3F1;
     --card: #FFFFFF;
-    --ink: #1A1A1A;
+    --ink: #241A10;
     --gray: #767676;
     --line: #EAEAEA;
     --accent: #FF5A1F;
     --accent-soft: #FFF0E8;
     --sat: #2563EB;
-    --sat-soft: #EEF3FE;
+    --green: #23814B;
+    --green-dark: #185F38;
+    --ribbon: #E2402D;
+    --grad-top: #FFDE59;
+    --grad-mid: #FFB627;
+    --grad-bottom: #FF9A1E;
   }}
   * {{ box-sizing: border-box; }}
   body {{
@@ -114,17 +124,56 @@ html = f"""<!DOCTYPE html>
     box-shadow: 0 20px 50px rgba(0,0,0,0.06);
   }}
 
-  /* ---------- Header ---------- */
+  /* ---------- Header (poster style) ---------- */
   .hero {{
-    padding: 34px 32px 26px;
+    position: relative;
+    padding: 22px 22px 30px;
     text-align: center;
-    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, var(--grad-top) 0%, var(--grad-mid) 55%, var(--grad-bottom) 100%);
+  }}
+  .hero-top {{
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+  }}
+  .brand-badge {{
+    width: 62px; height: 62px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #fff;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    flex: 0 0 auto;
+  }}
+  .brand-badge img {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
+  .tagline {{
+    padding-top: 8px;
+    font-family: 'Kalam', cursive;
+    color: var(--green-dark);
+  }}
+  .tagline-text {{ display: block; font-size: 15px; font-weight: 700; }}
+  .tagline-stars {{ display: block; font-size: 10px; letter-spacing: 3px; color: var(--ribbon); margin-top: 2px; }}
+  .side-badge {{
+    flex: 0 0 auto;
+    width: 68px;
+    background: #fff;
+    color: var(--green-dark);
+    font-weight: 800;
+    font-size: 8.5px;
+    line-height: 1.5;
+    text-align: center;
+    padding: 7px 4px;
+    border-radius: 10px;
+    border: 1.5px dashed var(--green);
+    transform: rotate(6deg);
   }}
   .avatar {{
-    width: 76px; height: 76px;
-    margin: 0 auto 14px;
+    width: 84px; height: 84px;
+    margin: 4px auto 10px;
     border-radius: 50%;
-    border: 1px solid var(--line);
+    border: 3px solid #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     overflow: hidden;
   }}
   .avatar img {{
@@ -136,20 +185,34 @@ html = f"""<!DOCTYPE html>
     font-family: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
     font-weight: 800;
     color: var(--ink);
-    font-size: clamp(28px, 5vw, 40px);
+    font-size: clamp(30px, 7vw, 42px);
     letter-spacing: -0.5px;
     margin: 0 0 12px;
+    text-shadow: 0 2px 0 rgba(255,255,255,0.35);
+  }}
+  .ribbon {{
+    display: inline-block;
+    background: var(--ribbon);
+    color: #fff;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 7px 22px;
+    border-radius: 3px;
+    margin-bottom: 18px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
   }}
   .month-banner {{
     display: inline-block;
-    background: var(--accent);
+    background: var(--green);
     color: #fff;
     font-weight: 700;
     font-size: 13px;
     letter-spacing: 0.5px;
-    padding: 7px 20px;
+    padding: 8px 22px;
     border-radius: 20px;
-    min-width: 150px;
+    min-width: 170px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.12);
   }}
   .month-nav {{
     display: flex;
@@ -158,34 +221,44 @@ html = f"""<!DOCTYPE html>
     gap: 10px;
   }}
   .nav-btn {{
-    width: 30px; height: 30px;
+    width: 32px; height: 32px;
     border-radius: 50%;
-    border: 1px solid var(--line);
-    background: var(--card);
+    border: none;
+    background: #fff;
     color: var(--ink);
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     padding: 0;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.12);
     transition: background 0.15s, color 0.15s;
   }}
-  .nav-btn:hover {{ background: var(--accent); color: #fff; border-color: var(--accent); }}
+  .nav-btn:hover {{ background: var(--green); color: #fff; }}
 
   .body-pad {{ padding: 26px 30px 30px; }}
 
   .subnote {{
-    text-align: center;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    text-align: left;
     font-size: 11px;
     color: var(--gray);
     background: #FAFAFA;
     border: 1px solid var(--line);
     border-radius: 10px;
-    padding: 10px 14px;
+    padding: 12px 14px;
     margin: 0 0 22px;
     line-height: 1.9;
+  }}
+  .subnote .subnote-pin {{
+    flex: 0 0 auto;
+    width: 18px; height: 18px;
+    margin-top: 1px;
+    color: var(--green);
   }}
 
   /* ---------- Schedule list (1 card per day) ---------- */
@@ -208,6 +281,8 @@ html = f"""<!DOCTYPE html>
     margin-bottom: 9px;
     border-bottom: 1px solid var(--line);
   }}
+  .day-card-head .daynum.sun {{ color: var(--ribbon); }}
+  .day-card-head .daynum.sat {{ color: var(--sat); }}
   .day-card-head .wd {{
     font-size: 11px;
     font-weight: 500;
@@ -239,7 +314,7 @@ html = f"""<!DOCTYPE html>
     color: var(--ink);
     text-decoration: none;
   }}
-  .place-link .pin {{ flex: 0 0 auto; margin-top: 3px; color: var(--accent); }}
+  .place-link .pin {{ flex: 0 0 auto; margin-top: 3px; color: var(--green); }}
   a.place-link:hover span {{ color: var(--accent); text-decoration: underline; }}
   .place-link.plain {{ color: var(--gray); font-weight: 400; }}
   .empty-state {{
@@ -249,25 +324,41 @@ html = f"""<!DOCTYPE html>
     padding: 40px 0;
   }}
 
-  /* ---------- Footer ---------- */
-  .footer {{ margin-top: 20px; text-align: center; }}
-  .footer .line {{
-    height: 1px; width: 100%; background: var(--line); margin-bottom: 16px;
+  /* ---------- Footer (poster style) ---------- */
+  .footer-bar {{
+    margin-top: 24px;
+    background: var(--grad-bottom);
+    color: #fff;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    text-align: center;
   }}
-  .signoff {{
+  .footer-bar .fb-side {{
+    font-weight: 800;
+    font-size: 10.5px;
+    line-height: 1.5;
+    letter-spacing: 0.5px;
+  }}
+  .footer-bar .fb-mid {{
+    font-family: 'Kalam', cursive;
     font-weight: 700;
     font-size: 14px;
-    color: var(--accent);
-    margin-bottom: 8px;
   }}
   .footnotes {{
     font-size: 10.5px;
     color: var(--gray);
+    text-align: center;
     line-height: 1.9;
+    margin-top: 18px;
+    padding: 0 30px;
   }}
   .credit {{
     text-align: right;
-    margin-top: 16px;
+    margin-top: 12px;
+    padding: 0 30px 24px;
   }}
   .credit-logo {{
     height: 15.6px;
@@ -279,14 +370,20 @@ html = f"""<!DOCTYPE html>
   @media (max-width: 480px) {{
     body {{ padding: 20px 6px; }}
     .poster {{ border-radius: 16px; }}
-    .hero {{ padding: 22px 14px 18px; }}
-    .avatar {{ width: 60px; height: 60px; margin-bottom: 10px; }}
+    .hero {{ padding: 16px 14px 22px; }}
+    .brand-badge {{ width: 46px; height: 46px; }}
+    .tagline-text {{ font-size: 11.5px; }}
+    .tagline-stars {{ font-size: 8px; }}
+    .side-badge {{ width: 54px; font-size: 7px; padding: 5px 3px; }}
+    .avatar {{ width: 64px; height: 64px; margin-bottom: 8px; }}
     .brand {{ font-size: clamp(22px, 8vw, 28px); margin-bottom: 8px; }}
-    .month-banner {{ font-size: 11px; padding: 5px 14px; min-width: 120px; }}
-    .nav-btn {{ width: 26px; height: 26px; font-size: 13px; }}
+    .ribbon {{ font-size: 10px; padding: 5px 16px; margin-bottom: 14px; }}
+    .month-banner {{ font-size: 11px; padding: 6px 16px; min-width: 130px; }}
+    .nav-btn {{ width: 27px; height: 27px; font-size: 13px; }}
     .month-nav {{ gap: 6px; }}
-    .body-pad {{ padding: 16px 8px 18px; }}
-    .subnote {{ font-size: 9.5px; padding: 8px 8px; margin: 0 0 14px; }}
+    .body-pad {{ padding: 16px 8px 4px; }}
+    .subnote {{ font-size: 9.5px; padding: 9px 10px; margin: 0 0 14px; }}
+    .subnote .subnote-pin {{ width: 14px; height: 14px; }}
 
     .day-card {{ padding: 10px 12px; border-radius: 10px; margin-bottom: 8px; }}
     .day-card-head {{ font-size: 13.5px; padding-bottom: 6px; margin-bottom: 6px; }}
@@ -299,10 +396,11 @@ html = f"""<!DOCTYPE html>
     .event-row .time {{ min-width: 0; font-size: 10.5px; }}
     .place-link {{ font-size: 11.5px; }}
 
-    .footer {{ margin-top: 10px; }}
-    .signoff {{ font-size: 13px; }}
-    .footnotes {{ font-size: 8.5px; }}
-    .credit {{ margin-top: 10px; }}
+    .footer-bar {{ margin-top: 16px; padding: 12px 14px; flex-wrap: wrap; row-gap: 4px; }}
+    .footer-bar .fb-side {{ font-size: 8.5px; }}
+    .footer-bar .fb-mid {{ font-size: 12px; flex: 1 1 100%; order: -1; }}
+    .footnotes {{ font-size: 8.5px; padding: 0 12px; }}
+    .credit {{ margin-top: 10px; padding: 0 12px 12px; }}
     .credit-logo {{ height: 12px; }}
   }}
 </style>
@@ -310,8 +408,18 @@ html = f"""<!DOCTYPE html>
 <body>
   <div class="poster">
     <div class="hero">
+      <div class="hero-top">
+        <div class="brand-badge"><img src="data:image/jpeg;base64,{TOP_LOGO_B64}" alt="あごぱっかーん"></div>
+        <div class="tagline">
+          <span class="tagline-text">Always Fresh &amp; Delicious!</span>
+          <span class="tagline-stars">★ ★ ★</span>
+        </div>
+        <div class="side-badge">GOOD BURGER<br>GOOD VIBES</div>
+      </div>
+
       <div class="avatar"><img src="data:image/png;base64,{AVATAR_B64}" alt="agopakkan"></div>
       <h1 class="brand">あごぱっかーん</h1>
+      <div class="ribbon">★ BURGER TIME! ★</div>
       <div class="month-nav">
         <button type="button" class="nav-btn" id="prevMonthBtn" aria-label="前の月">‹</button>
         <div class="month-banner" id="monthBanner">{YEAR}年{MONTH}月 出店スケジュール</div>
@@ -321,25 +429,28 @@ html = f"""<!DOCTYPE html>
 
     <div class="body-pad">
       <div class="subnote">
-        場所名をタップ／クリックすると、Google マップで確認できます（別タブで開きます）。<br>
-        ※ ‹ › ボタンで表示する月を切り替えられます。Googleカレンダー連携時は、切り替えた月の最新の予定を自動取得します。
+        {PIN_SVG.replace('class="pin"', 'class="subnote-pin"')}
+        <span>
+          場所名をタップ／クリックすると、Google マップで確認できます（別タブで開きます）。<br>
+          ※ ‹ › ボタンで表示する月を切り替えられます。Googleカレンダー連携時は、切り替えた月の最新の予定を自動取得します。
+        </span>
       </div>
 
       <div id="scheduleList">
         {schedule_html}
       </div>
+    </div>
 
-      <div class="footer">
-        <div class="line"></div>
-        <div class="signoff">Have a good burger time.</div>
-        <div class="footnotes">
-          天候や状況により、変更・中止となる場合がございます。<br>
-          最新情報はSNSをご確認ください。
-        </div>
-        <div class="credit">
-          <img class="credit-logo" src="data:image/png;base64,{LOGO_B64}" alt="IMT-Systems">
-        </div>
-      </div>
+    <div class="footer-bar">
+      <div class="fb-side">GOOD FOOD<br>GOOD MOOD</div>
+      <div class="fb-mid">Have a good burger time.</div>
+      <div class="fb-side">AGOPAKKAN BURGER<br>あごぱっかーん</div>
+    </div>
+    <div class="footnotes">
+      天候や状況により、変更・中止となる場合がございます。最新情報はSNSをご確認ください。
+    </div>
+    <div class="credit">
+      <img class="credit-logo" src="data:image/png;base64,{LOGO_B64}" alt="IMT-Systems">
     </div>
   </div>
 
@@ -425,7 +536,9 @@ html = f"""<!DOCTYPE html>
 
     var html = "";
     days.forEach(function(day) {{
-      var wd = WD_JP[new Date(year, month - 1, day).getDay()];
+      var wdIdx = new Date(year, month - 1, day).getDay();
+      var wd = WD_JP[wdIdx];
+      var numCls = wdIdx === 0 ? "sun" : (wdIdx === 6 ? "sat" : "");
       var rows = "";
       byDay[day].forEach(function(e) {{
         var link = e.mapsQuery ? mapsUrl(e.mapsQuery) : null;
@@ -435,7 +548,7 @@ html = f"""<!DOCTYPE html>
         rows += '<div class="event-row"><span class="time">' + escapeHtml(e.time) + '</span>' + placeHtml + '</div>';
       }});
       html += '<div class="day-card">'
-        + '<div class="day-card-head">' + pad2(day) + '<span class="wd">(' + wd + ')</span></div>'
+        + '<div class="day-card-head"><span class="daynum ' + numCls + '">' + pad2(day) + '</span><span class="wd">(' + wd + ')</span></div>'
         + '<div class="day-card-body">' + rows + '</div>'
         + '</div>';
     }});
