@@ -28,24 +28,26 @@ PIN_SVG = (
 def maps_url(query):
     return f"https://www.google.com/maps/search/?api=1&query={quote(query)}"
 
-def day_rows_html(day, wd_label, events):
+def day_card_html(day, wd_label, events):
     rows = ""
-    for i, e in enumerate(events):
-        row_cls = "sched-row" if i == 0 else "sched-row repeat"
-        date_html = f'{day:02d}<span class="wd">({wd_label})</span>'
+    for e in events:
         link = maps_url(e["maps"]) if e.get("maps") else None
         place_html = (
             f'<a class="place-link" href="{link}" target="_blank" rel="noopener">{PIN_SVG}<span>{e["name"]}</span></a>'
             if link else f'<span class="place-link plain">{e["name"]}</span>'
         )
         rows += (
-            f'<div class="{row_cls}">'
-            f'<div class="cell date">{date_html}</div>'
-            f'<div class="cell time">{e["time"]}</div>'
-            f'<div class="cell place">{place_html}</div>'
+            f'<div class="event-row">'
+            f'<span class="time">{e["time"]}</span>'
+            f'{place_html}'
             f'</div>'
         )
-    return rows
+    return (
+        f'<div class="day-card">'
+        f'<div class="day-card-head">{day:02d}<span class="wd">({wd_label})</span></div>'
+        f'<div class="day-card-body">{rows}</div>'
+        f'</div>'
+    )
 
 schedule_html = ""
 for day in sorted(EVENTS.keys()):
@@ -53,7 +55,7 @@ for day in sorted(EVENTS.keys()):
     if not real_events:
         continue
     wd_label = WEEKDAY_JP[(datetime.date(YEAR, MONTH, day).weekday() + 1) % 7]
-    schedule_html += day_rows_html(day, wd_label, real_events)
+    schedule_html += day_card_html(day, wd_label, real_events)
 
 if not schedule_html:
     schedule_html = '<div class="empty-state">この月の出店予定はまだありません。</div>'
@@ -186,44 +188,46 @@ html = f"""<!DOCTYPE html>
     line-height: 1.9;
   }}
 
-  /* ---------- Schedule list ---------- */
-  .sched-head {{
-    display: grid;
-    grid-template-columns: 84px 116px 1fr;
-    padding: 0 6px 8px;
-    color: var(--gray);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    border-bottom: 2px solid var(--line);
-    margin-bottom: 2px;
+  /* ---------- Schedule list (1 card per day) ---------- */
+  .day-card {{
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--card);
+    padding: 14px 18px;
+    margin-bottom: 12px;
   }}
-  .sched-row {{
-    display: grid;
-    grid-template-columns: 84px 116px 1fr;
-    align-items: center;
-    column-gap: 4px;
-    padding: 12px 6px;
+  .day-card:last-child {{ margin-bottom: 0; }}
+  .day-card-head {{
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    font-weight: 800;
+    font-size: 16px;
+    color: var(--ink);
+    padding-bottom: 9px;
+    margin-bottom: 9px;
     border-bottom: 1px solid var(--line);
   }}
-  .sched-row:last-child {{ border-bottom: none; }}
-  .sched-row .cell.date {{
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--ink);
-  }}
-  .sched-row .cell.date .wd {{
-    display: block;
+  .day-card-head .wd {{
+    font-size: 11px;
     font-weight: 500;
-    font-size: 10px;
     color: var(--gray);
-    margin-top: 1px;
   }}
-  .sched-row.repeat .cell.date {{ visibility: hidden; }}
-  .sched-row .cell.time {{
+  .day-card-body .event-row {{
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 6px 0;
+  }}
+  .day-card-body .event-row + .event-row {{
+    border-top: 1px dashed var(--line);
+  }}
+  .event-row .time {{
+    flex: 0 0 auto;
+    min-width: 92px;
     font-size: 12.5px;
-    color: var(--gray);
     font-weight: 600;
+    color: var(--gray);
   }}
   .place-link {{
     display: flex;
@@ -284,19 +288,15 @@ html = f"""<!DOCTYPE html>
     .body-pad {{ padding: 16px 8px 18px; }}
     .subnote {{ font-size: 9.5px; padding: 8px 8px; margin: 0 0 14px; }}
 
-    .sched-head {{ display: none; }}
-    .sched-row {{
-      display: flex;
+    .day-card {{ padding: 10px 12px; border-radius: 10px; margin-bottom: 8px; }}
+    .day-card-head {{ font-size: 13.5px; padding-bottom: 6px; margin-bottom: 6px; }}
+    .day-card-body .event-row {{
       flex-wrap: wrap;
-      align-items: baseline;
       column-gap: 8px;
-      padding: 9px 4px;
+      row-gap: 2px;
+      padding: 6px 0;
     }}
-    .sched-row.repeat .cell.date {{ visibility: visible; }}
-    .sched-row .cell.date {{ order: 1; font-size: 12px; }}
-    .sched-row .cell.date .wd {{ display: inline; margin-left: 3px; }}
-    .sched-row .cell.time {{ order: 2; font-size: 11px; }}
-    .sched-row .cell.place {{ order: 3; flex: 1 1 100%; margin-top: 3px; }}
+    .event-row .time {{ min-width: 0; font-size: 10.5px; }}
     .place-link {{ font-size: 11.5px; }}
 
     .footer {{ margin-top: 10px; }}
@@ -325,7 +325,6 @@ html = f"""<!DOCTYPE html>
         ※ ‹ › ボタンで表示する月を切り替えられます。Googleカレンダー連携時は、切り替えた月の最新の予定を自動取得します。
       </div>
 
-      <div class="sched-head"><span>DATE</span><span>TIME</span><span>PLACE</span></div>
       <div id="scheduleList">
         {schedule_html}
       </div>
@@ -427,19 +426,18 @@ html = f"""<!DOCTYPE html>
     var html = "";
     days.forEach(function(day) {{
       var wd = WD_JP[new Date(year, month - 1, day).getDay()];
-      byDay[day].forEach(function(e, i) {{
+      var rows = "";
+      byDay[day].forEach(function(e) {{
         var link = e.mapsQuery ? mapsUrl(e.mapsQuery) : null;
         var placeHtml = link
           ? '<a class="place-link" href="' + link + '" target="_blank" rel="noopener">' + pinSvg() + '<span>' + escapeHtml(e.name) + '</span></a>'
           : '<span class="place-link plain">' + escapeHtml(e.name) + '</span>';
-        var rowCls = "sched-row" + (i === 0 ? "" : " repeat");
-        var dateHtml = pad2(day) + '<span class="wd">(' + wd + ')</span>';
-        html += '<div class="' + rowCls + '">'
-          + '<div class="cell date">' + dateHtml + '</div>'
-          + '<div class="cell time">' + escapeHtml(e.time) + '</div>'
-          + '<div class="cell place">' + placeHtml + '</div>'
-          + '</div>';
+        rows += '<div class="event-row"><span class="time">' + escapeHtml(e.time) + '</span>' + placeHtml + '</div>';
       }});
+      html += '<div class="day-card">'
+        + '<div class="day-card-head">' + pad2(day) + '<span class="wd">(' + wd + ')</span></div>'
+        + '<div class="day-card-body">' + rows + '</div>'
+        + '</div>';
     }});
     return html;
   }}
