@@ -428,11 +428,53 @@
     loadMonth(y, m);
   }
 
+  // Googleカレンダーへの問い合わせは「JST（日本時間）で日付が変わってから最初の1回」だけ行い、
+  // 結果はブラウザのlocalStorageにその日の日付付きでキャッシュします。
+  // 同じ日のうちに再訪・月切り替えをしてもキャッシュを使い回すことで、
+  // 実質「1日1回、0:00以降に更新」という挙動になります。
+  function todayJst() {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit"
+    }).format(new Date()); // "YYYY-MM-DD"
+  }
+
+  function cacheKey(year, month) {
+    return "agopakkan_cache_" + year + "-" + pad2(month);
+  }
+
+  function readCache(year, month) {
+    try {
+      var raw = localStorage.getItem(cacheKey(year, month));
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  function writeCache(year, month, byDay) {
+    try {
+      localStorage.setItem(cacheKey(year, month), JSON.stringify({ date: todayJst(), byDay: byDay }));
+    } catch (e) { /* localStorage無効時は無視してその都度取得 */ }
+  }
+
+  function renderByDay(byDay) {
+    document.querySelectorAll("td.day-cell[data-day]").forEach(function(td) {
+      var day = parseInt(td.dataset.day, 10);
+      renderCell(td, byDay[day] || []);
+    });
+  }
+
   async function refreshForMonth(year, month) {
     if (!CONFIG.apiKey || CONFIG.apiKey.indexOf("YOUR_") === 0) {
       console.log("[あごぱっかーんカレンダー] Google Calendar APIキー未設定のため、" + year + "年" + month + "月はフォールバック／空欄表示です。");
       return;
     }
+    var today = todayJst();
+    var cached = readCache(year, month);
+    if (cached && cached.date === today) {
+      renderByDay(cached.byDay);
+      console.log("[あごぱっかーんカレンダー] " + year + "年" + month + "月は本日(" + today + ")取得済みのキャッシュを表示中です。");
+      return;
+    }
+
     var mySeq = ++requestSeq;
     try {
       var nextY = month === 12 ? year + 1 : year;
@@ -455,14 +497,15 @@
         if (!info) return;
         (byDay[info.day] = byDay[info.day] || []).push(info);
       });
-      document.querySelectorAll("td.day-cell[data-day]").forEach(function(td) {
-        var day = parseInt(td.dataset.day, 10);
-        renderCell(td, byDay[day] || []);
-      });
-      console.log("[あごぱっかーんカレンダー] " + year + "年" + month + "月の最新の予定を反映しました。");
+      writeCache(year, month, byDay);
+      renderByDay(byDay);
+      console.log("[あごぱっかーんカレンダー] " + year + "年" + month + "月の最新の予定を取得し、本日分としてキャッシュしました。");
     } catch (err) {
       if (mySeq !== requestSeq) return;
       console.warn("[あごぱっかーんカレンダー] Googleカレンダーの取得に失敗しました。", err);
+      if (cached) {
+        renderByDay(cached.byDay); // 取得失敗時は古いキャッシュがあればそれで表示
+      }
     }
   }
 
