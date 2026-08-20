@@ -29,7 +29,7 @@
     justify-content: center;
   }
   .poster {
-    max-width: 920px;
+    max-width: 640px;
     width: 100%;
     background: var(--card);
     border-radius: 20px;
@@ -112,69 +112,63 @@
     line-height: 1.9;
   }
 
-  /* ---------- Calendar ---------- */
-  table.calendar {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: separate;
-    border-spacing: 5px;
-  }
-  table.calendar th {
+  /* ---------- Schedule list ---------- */
+  .sched-head {
+    display: grid;
+    grid-template-columns: 84px 116px 1fr;
+    padding: 0 6px 8px;
     color: var(--gray);
-    font-weight: 700;
     font-size: 11px;
-    letter-spacing: 2px;
-    padding: 0 0 10px;
-    text-align: center;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    border-bottom: 2px solid var(--line);
+    margin-bottom: 2px;
   }
-  table.calendar th.sun-head { color: var(--accent); }
-  table.calendar th.sat-head { color: var(--sat); }
-
-  td.day-cell {
-    vertical-align: top;
-    width: 14.28%;
-    height: 120px;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 8px 8px 6px;
-    position: relative;
+  .sched-row {
+    display: grid;
+    grid-template-columns: 84px 116px 1fr;
+    align-items: center;
+    column-gap: 4px;
+    padding: 12px 6px;
+    border-bottom: 1px solid var(--line);
   }
-  td.day-cell.empty { background: transparent; border: 1px dashed var(--line); }
-  td.day-cell.is-sun { background: var(--accent-soft); }
-  td.day-cell.is-sat { background: var(--sat-soft); }
-  td.day-cell.has-event { border-color: #DDD; }
-
-  .date-row { display: flex; align-items: baseline; justify-content: space-between; }
-  .date-num {
-    font-family: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
+  .sched-row:last-child { border-bottom: none; }
+  .sched-row .cell.date {
     font-weight: 700;
     font-size: 14px;
     color: var(--ink);
   }
-  .date-num.sun { color: var(--accent); }
-  .date-num.sat { color: var(--sat); }
-  .wd-label { font-size: 9px; color: var(--gray); }
-
-  .events { margin-top: 7px; }
-  .event { margin-bottom: 7px; }
-  .event-name {
+  .sched-row .cell.date .wd {
+    display: block;
+    font-weight: 500;
+    font-size: 10px;
+    color: var(--gray);
+    margin-top: 1px;
+  }
+  .sched-row.repeat .cell.date { visibility: hidden; }
+  .sched-row .cell.time {
+    font-size: 12.5px;
+    color: var(--gray);
+    font-weight: 600;
+  }
+  .place-link {
     display: flex;
     align-items: flex-start;
-    gap: 4px;
-    font-size: 10.5px;
-    line-height: 1.35;
+    gap: 5px;
+    font-size: 13px;
+    line-height: 1.4;
     font-weight: 600;
     color: var(--ink);
     text-decoration: none;
   }
-  .event-name .pin { flex: 0 0 auto; margin-top: 3px; color: var(--accent); }
-  a.event-name:hover span { color: var(--accent); text-decoration: underline; }
-  .event-name.plain { color: var(--gray); font-weight: 400; }
-  .event-time {
-    font-size: 9.5px;
+  .place-link .pin { flex: 0 0 auto; margin-top: 3px; color: var(--accent); }
+  a.place-link:hover span { color: var(--accent); text-decoration: underline; }
+  .place-link.plain { color: var(--gray); font-weight: 400; }
+  .empty-state {
+    text-align: center;
     color: var(--gray);
-    margin-top: 2px;
+    font-size: 13px;
+    padding: 40px 0;
   }
 
   /* ---------- Footer ---------- */
@@ -203,7 +197,7 @@
     opacity: 0.7;
   }
 
-  /* ---------- Mobile: keep all 7 columns on one screen width ---------- */
+  /* ---------- Mobile ---------- */
   @media (max-width: 480px) {
     body { padding: 20px 6px; }
     .poster { border-radius: 16px; }
@@ -216,17 +210,20 @@
     .body-pad { padding: 16px 8px 18px; }
     .subnote { font-size: 9.5px; padding: 8px 8px; margin: 0 0 14px; }
 
-    table.calendar { border-spacing: 2px; }
-    table.calendar th { font-size: 8px; letter-spacing: 0.5px; padding: 0 0 6px; }
-
-    td.day-cell { height: 88px; padding: 3px 3px 2px; border-radius: 6px; }
-    .date-num { font-size: 10px; }
-    .wd-label { font-size: 6.5px; }
-    .events { margin-top: 2px; }
-    .event { margin-bottom: 3px; }
-    .event-name { font-size: 6.8px; gap: 1px; line-height: 1.15; }
-    .event-name .pin { width: 6px; height: 6px; margin-top: 1px; }
-    .event-time { font-size: 6px; margin-top: 0; }
+    .sched-head { display: none; }
+    .sched-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      column-gap: 8px;
+      padding: 9px 4px;
+    }
+    .sched-row.repeat .cell.date { visibility: visible; }
+    .sched-row .cell.date { order: 1; font-size: 12px; }
+    .sched-row .cell.date .wd { display: inline; margin-left: 3px; }
+    .sched-row .cell.time { order: 2; font-size: 11px; }
+    .sched-row .cell.place { order: 3; flex: 1 1 100%; margin-top: 3px; }
+    .place-link { font-size: 11.5px; }
 
     .footer { margin-top: 10px; }
     .signoff { font-size: 13px; }
@@ -250,22 +247,14 @@
 
     <div class="body-pad">
       <div class="subnote">
-        出店場所名をタップ／クリックすると、Google マップで場所を確認できます（別タブで開きます）。<br>
+        場所名をタップ／クリックすると、Google マップで確認できます（別タブで開きます）。<br>
         ※ ‹ › ボタンで表示する月を切り替えられます。Googleカレンダー連携時は、切り替えた月の最新の予定を自動取得します。
       </div>
 
-      <table class="calendar">
-        <thead><tr><th class="sun-head">SUN</th><th class="">MON</th><th class="">TUE</th><th class="">WED</th><th class="">THU</th><th class="">FRI</th><th class="sat-head">SAT</th></tr></thead>
-        <tbody id="calendarBody">
-          <tr><td class="day-cell empty"></td><td class="day-cell empty"></td><td class="day-cell empty"></td><td class="day-cell empty"></td><td class="day-cell empty"></td><td class="day-cell empty"></td><td class="day-cell is-sat has-event" data-day="1" data-wd="土"><div class="date-row"><span class="date-num sat">01</span><span class="wd-label">土</span></div><div class="events"><div class="event"><a class="event-name" href="https://www.google.com/maps/search/?api=1&query=%E5%8F%A4%E6%B2%B3%E8%8A%B1%E7%81%AB%E5%A4%A7%E4%BC%9A" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>古河花火</span></a><div class="event-time">14:00〜22:00</div></div></div></td></tr>
-<tr><td class="day-cell is-sun has-event" data-day="2" data-wd="日"><div class="date-row"><span class="date-num sun">02</span><span class="wd-label">日</span></div><div class="events"><div class="event"><a class="event-name" href="https://www.google.com/maps/search/?api=1&query=%E6%B0%B4%E6%88%B8%E9%BB%84%E9%96%80%E3%81%BE%E3%81%A4%E3%82%8A" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>水戸黄門祭り</span></a><div class="event-time">11:00〜21:00</div></div></div></td><td class="day-cell" data-day="3" data-wd="月"><div class="date-row"><span class="date-num ">03</span></div><div class="events"></div></td><td class="day-cell" data-day="4" data-wd="火"><div class="date-row"><span class="date-num ">04</span></div><div class="events"></div></td><td class="day-cell" data-day="5" data-wd="水"><div class="date-row"><span class="date-num ">05</span></div><div class="events"></div></td><td class="day-cell" data-day="6" data-wd="木"><div class="date-row"><span class="date-num ">06</span></div><div class="events"></div></td><td class="day-cell" data-day="7" data-wd="金"><div class="date-row"><span class="date-num ">07</span></div><div class="events"></div></td><td class="day-cell is-sat has-event" data-day="8" data-wd="土"><div class="date-row"><span class="date-num sat">08</span><span class="wd-label">土</span></div><div class="events"><div class="event"><a class="event-name" href="https://www.google.com/maps/search/?api=1&query=%E3%83%A4%E3%83%9E%E3%82%B6%E3%82%AD%E3%83%93%E3%82%B9%E3%82%B1%E3%83%83%E3%83%88%20%E3%82%B5%E3%83%9E%E3%83%BC%E3%83%95%E3%82%A7%E3%82%B9%E3%83%86%E3%82%A3%E3%83%90%E3%83%AB" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>ヤマザキビスケット サマーフェスティバル</span></a><div class="event-time">09:00〜12:00</div></div></div></td></tr>
-<tr><td class="day-cell is-sun" data-day="9" data-wd="日"><div class="date-row"><span class="date-num sun">09</span></div><div class="events"></div></td><td class="day-cell" data-day="10" data-wd="月"><div class="date-row"><span class="date-num ">10</span></div><div class="events"></div></td><td class="day-cell has-event" data-day="11" data-wd="火"><div class="date-row"><span class="date-num ">11</span><span class="wd-label">火</span></div><div class="events"><div class="event"><a class="event-name" href="https://www.google.com/maps/search/?api=1&query=%E5%B1%85%E9%85%92%E5%B1%8B%20%E9%85%94%E4%BC%8A%E4%BD%90" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>居酒屋 酔伊佐</span></a><div class="event-time">11:00〜17:00</div></div></div></td><td class="day-cell has-event" data-day="12" data-wd="水"><div class="date-row"><span class="date-num ">12</span><span class="wd-label">水</span></div><div class="events"><div class="event"><a class="event-name" href="https://www.google.com/maps/search/?api=1&query=%E7%BE%8E%E5%AE%B9%E5%AE%A4%E3%82%A4%E3%83%AA%E3%82%B9" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>美容室イリス</span></a><div class="event-time">10:00〜17:00</div></div></div></td><td class="day-cell" data-day="13" data-wd="木"><div class="date-row"><span class="date-num ">13</span></div><div class="events"></div></td><td class="day-cell has-event" data-day="14" data-wd="金"><div class="date-row"><span class="date-num ">14</span><span class="wd-label">金</span></div><div class="events"><div class="event"><a class="event-name" href="https://www.google.com/maps/search/?api=1&query=%E5%AE%87%E9%83%BD%E5%AE%AE%E3%82%AA%E3%83%AA%E3%82%AA%E3%83%B3%E9%80%9A%E3%82%8A" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>宇都宮オリオン通り</span></a><div class="event-time">11:00〜20:00</div></div></div></td><td class="day-cell is-sat has-event" data-day="15" data-wd="土"><div class="date-row"><span class="date-num sat">15</span><span class="wd-label">土</span></div><div class="events"><div class="event"><a class="event-name" href="https://www.google.com/maps/search/?api=1&query=%E8%B0%B7%E8%B2%9D%20%E7%9B%86%E8%B8%8A%E3%82%8A%E5%A4%A7%E4%BC%9A" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>第37回 谷貝盆踊り大会</span></a><div class="event-time">18:00〜21:00</div></div></div></td></tr>
-<tr><td class="day-cell is-sun" data-day="16" data-wd="日"><div class="date-row"><span class="date-num sun">16</span></div><div class="events"></div></td><td class="day-cell" data-day="17" data-wd="月"><div class="date-row"><span class="date-num ">17</span></div><div class="events"></div></td><td class="day-cell" data-day="18" data-wd="火"><div class="date-row"><span class="date-num ">18</span></div><div class="events"></div></td><td class="day-cell" data-day="19" data-wd="水"><div class="date-row"><span class="date-num ">19</span></div><div class="events"></div></td><td class="day-cell" data-day="20" data-wd="木"><div class="date-row"><span class="date-num ">20</span></div><div class="events"></div></td><td class="day-cell" data-day="21" data-wd="金"><div class="date-row"><span class="date-num ">21</span></div><div class="events"></div></td><td class="day-cell is-sat has-event" data-day="22" data-wd="土"><div class="date-row"><span class="date-num sat">22</span><span class="wd-label">土</span></div><div class="events"><div class="event"><a class="event-name" href="https://www.google.com/maps/search/?api=1&query=%E6%A0%83%E6%9C%A8%E7%9C%8C%E5%8D%97%E5%B8%82%E5%A0%B4" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>栃木県南市場</span></a><div class="event-time">08:30〜11:00</div></div><div class="event"><a class="event-name" href="https://www.google.com/maps/search/?api=1&query=%E9%B4%BB%E5%B7%A3%E5%A4%8F%E7%A5%AD%E3%82%8A%20%E3%83%AD%E3%83%83%E3%82%AF%E3%83%95%E3%82%A7%E3%82%B9" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>鴻巣夏祭りロックフェス</span></a><div class="event-time">17:00〜21:00</div></div></div></td></tr>
-<tr><td class="day-cell is-sun" data-day="23" data-wd="日"><div class="date-row"><span class="date-num sun">23</span></div><div class="events"></div></td><td class="day-cell" data-day="24" data-wd="月"><div class="date-row"><span class="date-num ">24</span></div><div class="events"></div></td><td class="day-cell has-event" data-day="25" data-wd="火"><div class="date-row"><span class="date-num ">25</span><span class="wd-label">火</span></div><div class="events"><div class="event"><a class="event-name" href="https://www.google.com/maps/search/?api=1&query=%E9%B4%BB%E5%B7%A3%E3%83%8A%E3%82%A4%E3%83%88%E3%83%9E%E3%83%BC%E3%82%B1%E3%83%83%E3%83%88" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>鴻巣ナイトマーケット</span></a><div class="event-time">16:00〜21:00</div></div></div></td><td class="day-cell" data-day="26" data-wd="水"><div class="date-row"><span class="date-num ">26</span></div><div class="events"></div></td><td class="day-cell" data-day="27" data-wd="木"><div class="date-row"><span class="date-num ">27</span></div><div class="events"></div></td><td class="day-cell has-event" data-day="28" data-wd="金"><div class="date-row"><span class="date-num ">28</span><span class="wd-label">金</span></div><div class="events"><div class="event"><a class="event-name" href="https://www.google.com/maps/search/?api=1&query=%E5%B0%8F%E5%B1%B1%E8%A5%BF%E5%8F%A3" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>サンノニノキンヨウビ 小山西口</span></a><div class="event-time">17:00〜21:00</div></div></div></td><td class="day-cell is-sat has-event" data-day="29" data-wd="土"><div class="date-row"><span class="date-num sat">29</span><span class="wd-label">土</span></div><div class="events"><div class="event"><a class="event-name" href="https://www.google.com/maps/search/?api=1&query=%E3%83%90%E3%83%96%E3%83%AB%E3%83%8A%E3%82%A4%E3%83%88" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>バブルナイト</span></a><div class="event-time">15:00〜19:30</div></div></div></td></tr>
-<tr><td class="day-cell is-sun" data-day="30" data-wd="日"><div class="date-row"><span class="date-num sun">30</span></div><div class="events"></div></td><td class="day-cell" data-day="31" data-wd="月"><div class="date-row"><span class="date-num ">31</span></div><div class="events"></div></td><td class="day-cell empty"></td><td class="day-cell empty"></td><td class="day-cell empty"></td><td class="day-cell empty"></td><td class="day-cell empty"></td></tr>
-
-        </tbody>
-      </table>
+      <div class="sched-head"><span>DATE</span><span>TIME</span><span>PLACE</span></div>
+      <div id="scheduleList">
+        <div class="sched-row"><div class="cell date">01<span class="wd">(土)</span></div><div class="cell time">14:00〜22:00</div><div class="cell place"><a class="place-link" href="https://www.google.com/maps/search/?api=1&query=%E5%8F%A4%E6%B2%B3%E8%8A%B1%E7%81%AB%E5%A4%A7%E4%BC%9A" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>古河花火</span></a></div></div><div class="sched-row"><div class="cell date">02<span class="wd">(日)</span></div><div class="cell time">11:00〜21:00</div><div class="cell place"><a class="place-link" href="https://www.google.com/maps/search/?api=1&query=%E6%B0%B4%E6%88%B8%E9%BB%84%E9%96%80%E3%81%BE%E3%81%A4%E3%82%8A" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>水戸黄門祭り</span></a></div></div><div class="sched-row"><div class="cell date">08<span class="wd">(土)</span></div><div class="cell time">09:00〜12:00</div><div class="cell place"><a class="place-link" href="https://www.google.com/maps/search/?api=1&query=%E3%83%A4%E3%83%9E%E3%82%B6%E3%82%AD%E3%83%93%E3%82%B9%E3%82%B1%E3%83%83%E3%83%88%20%E3%82%B5%E3%83%9E%E3%83%BC%E3%83%95%E3%82%A7%E3%82%B9%E3%83%86%E3%82%A3%E3%83%90%E3%83%AB" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>ヤマザキビスケット サマーフェスティバル</span></a></div></div><div class="sched-row"><div class="cell date">11<span class="wd">(火)</span></div><div class="cell time">11:00〜17:00</div><div class="cell place"><a class="place-link" href="https://www.google.com/maps/search/?api=1&query=%E5%B1%85%E9%85%92%E5%B1%8B%20%E9%85%94%E4%BC%8A%E4%BD%90" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>居酒屋 酔伊佐</span></a></div></div><div class="sched-row"><div class="cell date">12<span class="wd">(水)</span></div><div class="cell time">10:00〜17:00</div><div class="cell place"><a class="place-link" href="https://www.google.com/maps/search/?api=1&query=%E7%BE%8E%E5%AE%B9%E5%AE%A4%E3%82%A4%E3%83%AA%E3%82%B9" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>美容室イリス</span></a></div></div><div class="sched-row"><div class="cell date">14<span class="wd">(金)</span></div><div class="cell time">11:00〜20:00</div><div class="cell place"><a class="place-link" href="https://www.google.com/maps/search/?api=1&query=%E5%AE%87%E9%83%BD%E5%AE%AE%E3%82%AA%E3%83%AA%E3%82%AA%E3%83%B3%E9%80%9A%E3%82%8A" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>宇都宮オリオン通り</span></a></div></div><div class="sched-row"><div class="cell date">15<span class="wd">(土)</span></div><div class="cell time">18:00〜21:00</div><div class="cell place"><a class="place-link" href="https://www.google.com/maps/search/?api=1&query=%E8%B0%B7%E8%B2%9D%20%E7%9B%86%E8%B8%8A%E3%82%8A%E5%A4%A7%E4%BC%9A" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>第37回 谷貝盆踊り大会</span></a></div></div><div class="sched-row"><div class="cell date">22<span class="wd">(土)</span></div><div class="cell time">08:30〜11:00</div><div class="cell place"><a class="place-link" href="https://www.google.com/maps/search/?api=1&query=%E6%A0%83%E6%9C%A8%E7%9C%8C%E5%8D%97%E5%B8%82%E5%A0%B4" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>栃木県南市場</span></a></div></div><div class="sched-row repeat"><div class="cell date">22<span class="wd">(土)</span></div><div class="cell time">17:00〜21:00</div><div class="cell place"><a class="place-link" href="https://www.google.com/maps/search/?api=1&query=%E9%B4%BB%E5%B7%A3%E5%A4%8F%E7%A5%AD%E3%82%8A%20%E3%83%AD%E3%83%83%E3%82%AF%E3%83%95%E3%82%A7%E3%82%B9" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>鴻巣夏祭りロックフェス</span></a></div></div><div class="sched-row"><div class="cell date">25<span class="wd">(火)</span></div><div class="cell time">16:00〜21:00</div><div class="cell place"><a class="place-link" href="https://www.google.com/maps/search/?api=1&query=%E9%B4%BB%E5%B7%A3%E3%83%8A%E3%82%A4%E3%83%88%E3%83%9E%E3%83%BC%E3%82%B1%E3%83%83%E3%83%88" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>鴻巣ナイトマーケット</span></a></div></div><div class="sched-row"><div class="cell date">28<span class="wd">(金)</span></div><div class="cell time">17:00〜21:00</div><div class="cell place"><a class="place-link" href="https://www.google.com/maps/search/?api=1&query=%E5%B0%8F%E5%B1%B1%E8%A5%BF%E5%8F%A3" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>サンノニノキンヨウビ 小山西口</span></a></div></div><div class="sched-row"><div class="cell date">29<span class="wd">(土)</span></div><div class="cell time">15:00〜19:30</div><div class="cell place"><a class="place-link" href="https://www.google.com/maps/search/?api=1&query=%E3%83%90%E3%83%96%E3%83%AB%E3%83%8A%E3%82%A4%E3%83%88" target="_blank" rel="noopener"><svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg><span>バブルナイト</span></a></div></div>
+      </div>
 
       <div class="footer">
         <div class="line"></div>
@@ -288,16 +277,16 @@
   // 2. 下の apiKey に貼り付けて保存すれば、ページを開く・月を切り替えるたびに
   //    その月のGoogleカレンダーの予定を自動取得してこのカレンダーに反映します。
   // 3. APIキーが未設定の間は、8月のみ生成時点の予定（フォールバック）を表示し、
-  //    他の月は空欄のカレンダー枠だけを表示します。
+  //    他の月は空欄表示です。
   // ---------------------------------------------------------------
   const CONFIG = {
-    apiKey: "AIzaSyBhjfTjVGVYqo-i9BWgnx9wJX7KqIWlzho", // ← ここにAPIキーを貼り付け
+    apiKey: "AIzaSyBhjfTjVGVYqo-i9BWgnx9wJX7KqIWlzho", // config.py の GOOGLE_CALENDAR_API_KEY を編集してください
     calendarId: "df6b731462fe72367bd49c005d12c05807f43b339da33ec813cd7b5b386e7385@group.calendar.google.com"
   };
 
   const FALLBACK_YEAR = 2026;
   const FALLBACK_MONTH = 8;
-  const FALLBACK_EVENTS = {"1": [{"name": "古河花火", "time": "14:00〜22:00", "maps": "古河花火大会"}], "2": [{"name": "水戸黄門祭り", "time": "11:00〜21:00", "maps": "水戸黄門まつり"}], "8": [{"name": "ヤマザキビスケット サマーフェスティバル", "time": "09:00〜12:00", "maps": "ヤマザキビスケット サマーフェスティバル"}], "11": [{"name": "居酒屋 酔伊佐", "time": "11:00〜17:00", "maps": "居酒屋 酔伊佐"}], "12": [{"name": "美容室イリス", "time": "10:00〜17:00", "maps": "美容室イリス"}], "14": [{"name": "宇都宮オリオン通り", "time": "11:00〜20:00", "maps": "宇都宮オリオン通り"}], "15": [{"name": "第37回 谷貝盆踊り大会", "time": "18:00〜21:00", "maps": "谷貝 盆踊り大会"}], "22": [{"name": "栃木県南市場", "time": "08:30〜11:00", "maps": "栃木県南市場"}, {"name": "鴻巣夏祭りロックフェス", "time": "17:00〜21:00", "maps": "鴻巣夏祭り ロックフェス"}], "25": [{"name": "鴻巣ナイトマーケット", "time": "16:00〜21:00", "maps": "鴻巣ナイトマーケット"}], "28": [{"name": "サンノニノキンヨウビ 小山西口", "time": "17:00〜21:00", "maps": "小山西口"}], "29": [{"name": "バブルナイト", "time": "15:00〜19:30", "maps": "バブルナイト"}]};
+  const FALLBACK_EVENTS = {"1":[{"name":"古河花火","time":"14:00〜22:00","maps":"古河花火大会"}],"2":[{"name":"水戸黄門祭り","time":"11:00〜21:00","maps":"水戸黄門まつり"}],"8":[{"name":"ヤマザキビスケット サマーフェスティバル","time":"09:00〜12:00","maps":"ヤマザキビスケット サマーフェスティバル"}],"11":[{"name":"居酒屋 酔伊佐","time":"11:00〜17:00","maps":"居酒屋 酔伊佐"}],"12":[{"name":"美容室イリス","time":"10:00〜17:00","maps":"美容室イリス"}],"14":[{"name":"宇都宮オリオン通り","time":"11:00〜20:00","maps":"宇都宮オリオン通り"}],"15":[{"name":"第37回 谷貝盆踊り大会","time":"18:00〜21:00","maps":"谷貝 盆踊り大会"}],"22":[{"name":"栃木県南市場","time":"08:30〜11:00","maps":"栃木県南市場"},{"name":"鴻巣夏祭りロックフェス","time":"17:00〜21:00","maps":"鴻巣夏祭り ロックフェス"}],"25":[{"name":"鴻巣ナイトマーケット","time":"16:00〜21:00","maps":"鴻巣ナイトマーケット"}],"28":[{"name":"サンノニノキンヨウビ 小山西口","time":"17:00〜21:00","maps":"小山西口"}],"29":[{"name":"バブルナイト","time":"15:00〜19:30","maps":"バブルナイト"}]};
   const WD_JP = ["日", "月", "火", "水", "木", "金", "土"];
 
   var currentYear = FALLBACK_YEAR;
@@ -351,66 +340,55 @@
     };
   }
 
-  function renderCell(td, evs) {
-    var wd = td.dataset.wd || "";
-    var day = parseInt(td.dataset.day, 10);
-    var numColor = td.classList.contains("is-sun") ? "sun" : (td.classList.contains("is-sat") ? "sat" : "");
-    var eventsHtml = "";
-    evs.forEach(function(e) {
-      var link = e.mapsQuery ? mapsUrl(e.mapsQuery) : null;
-      var nameHtml = link
-        ? '<a class="event-name" href="' + link + '" target="_blank" rel="noopener">' + pinSvg() + '<span>' + escapeHtml(e.name) + '</span></a>'
-        : '<span class="event-name plain">' + escapeHtml(e.name) + '</span>';
-      eventsHtml += '<div class="event">' + nameHtml + '<div class="event-time">' + escapeHtml(e.time) + '</div></div>';
-    });
-    var wdLabel = evs.length ? ('<span class="wd-label">' + wd + '</span>') : "";
-    td.classList.toggle("has-event", evs.length > 0);
-    td.innerHTML = '<div class="date-row"><span class="date-num ' + numColor + '">' + pad2(day) + '</span>' + wdLabel + '</div>'
-      + '<div class="events">' + eventsHtml + '</div>';
-  }
+  function buildScheduleHtml(year, month, byDay) {
+    var days = Object.keys(byDay)
+      .map(Number)
+      .filter(function(d) { return byDay[d] && byDay[d].length; })
+      .sort(function(a, b) { return a - b; });
 
-  function buildGridHtml(year, month) {
-    var first = new Date(year, month - 1, 1);
-    var startWd = first.getDay(); // 0=Sun..6=Sat
-    var daysInMonth = new Date(year, month, 0).getDate();
-    var cells = [];
-    for (var i = 0; i < startWd; i++) cells.push(null);
-    for (var d = 1; d <= daysInMonth; d++) cells.push(d);
-    while (cells.length % 7 !== 0) cells.push(null);
+    if (!days.length) {
+      return '<div class="empty-state">この月の出店予定はまだありません。</div>';
+    }
 
     var html = "";
-    for (var r = 0; r < cells.length; r += 7) {
-      html += "<tr>";
-      for (var c = 0; c < 7; c++) {
-        var day = cells[r + c];
-        if (day === null) {
-          html += '<td class="day-cell empty"></td>';
-        } else {
-          var isSun = c === 0, isSat = c === 6;
-          var cls = "day-cell" + (isSun ? " is-sun" : "") + (isSat ? " is-sat" : "");
-          var numColor = isSun ? "sun" : (isSat ? "sat" : "");
-          html += '<td class="' + cls + '" data-day="' + day + '" data-wd="' + WD_JP[c] + '">'
-            + '<div class="date-row"><span class="date-num ' + numColor + '">' + pad2(day) + '</span></div>'
-            + '<div class="events"></div></td>';
-        }
-      }
-      html += "</tr>";
-    }
+    days.forEach(function(day) {
+      var wd = WD_JP[new Date(year, month - 1, day).getDay()];
+      byDay[day].forEach(function(e, i) {
+        var link = e.mapsQuery ? mapsUrl(e.mapsQuery) : null;
+        var placeHtml = link
+          ? '<a class="place-link" href="' + link + '" target="_blank" rel="noopener">' + pinSvg() + '<span>' + escapeHtml(e.name) + '</span></a>'
+          : '<span class="place-link plain">' + escapeHtml(e.name) + '</span>';
+        var rowCls = "sched-row" + (i === 0 ? "" : " repeat");
+        var dateHtml = pad2(day) + '<span class="wd">(' + wd + ')</span>';
+        html += '<div class="' + rowCls + '">'
+          + '<div class="cell date">' + dateHtml + '</div>'
+          + '<div class="cell time">' + escapeHtml(e.time) + '</div>'
+          + '<div class="cell place">' + placeHtml + '</div>'
+          + '</div>';
+      });
+    });
     return html;
+  }
+
+  function renderSchedule(year, month, byDay) {
+    document.getElementById("scheduleList").innerHTML = buildScheduleHtml(year, month, byDay);
   }
 
   function loadMonth(year, month) {
     currentYear = year;
     currentMonth = month;
-    document.getElementById("calendarBody").innerHTML = buildGridHtml(year, month);
     document.getElementById("monthBanner").textContent = year + "年" + month + "月 出店スケジュール";
 
     if (year === FALLBACK_YEAR && month === FALLBACK_MONTH) {
-      document.querySelectorAll("td.day-cell[data-day]").forEach(function(td) {
-        var raw = FALLBACK_EVENTS[td.dataset.day] || [];
-        var evs = raw.map(function(e) { return { name: e.name, time: e.time, mapsQuery: e.maps || e.name }; });
-        renderCell(td, evs);
+      var byDay = {};
+      Object.keys(FALLBACK_EVENTS).forEach(function(d) {
+        byDay[d] = FALLBACK_EVENTS[d].map(function(e) {
+          return { name: e.name, time: e.time, mapsQuery: e.maps || e.name };
+        });
       });
+      renderSchedule(year, month, byDay);
+    } else {
+      document.getElementById("scheduleList").innerHTML = '<div class="empty-state">読み込み中…</div>';
     }
 
     refreshForMonth(year, month);
@@ -455,13 +433,6 @@
     } catch (e) { /* localStorage無効時は無視してその都度取得 */ }
   }
 
-  function renderByDay(byDay) {
-    document.querySelectorAll("td.day-cell[data-day]").forEach(function(td) {
-      var day = parseInt(td.dataset.day, 10);
-      renderCell(td, byDay[day] || []);
-    });
-  }
-
   async function refreshForMonth(year, month) {
     if (!CONFIG.apiKey || CONFIG.apiKey.indexOf("YOUR_") === 0) {
       console.log("[あごぱっかーんカレンダー] Google Calendar APIキー未設定のため、" + year + "年" + month + "月はフォールバック／空欄表示です。");
@@ -470,7 +441,7 @@
     var today = todayJst();
     var cached = readCache(year, month);
     if (cached && cached.date === today) {
-      renderByDay(cached.byDay);
+      renderSchedule(year, month, cached.byDay);
       console.log("[あごぱっかーんカレンダー] " + year + "年" + month + "月は本日(" + today + ")取得済みのキャッシュを表示中です。");
       return;
     }
@@ -498,13 +469,13 @@
         (byDay[info.day] = byDay[info.day] || []).push(info);
       });
       writeCache(year, month, byDay);
-      renderByDay(byDay);
+      renderSchedule(year, month, byDay);
       console.log("[あごぱっかーんカレンダー] " + year + "年" + month + "月の最新の予定を取得し、本日分としてキャッシュしました。");
     } catch (err) {
       if (mySeq !== requestSeq) return;
       console.warn("[あごぱっかーんカレンダー] Googleカレンダーの取得に失敗しました。", err);
       if (cached) {
-        renderByDay(cached.byDay); // 取得失敗時は古いキャッシュがあればそれで表示
+        renderSchedule(year, month, cached.byDay); // 取得失敗時は古いキャッシュがあればそれで表示
       }
     }
   }

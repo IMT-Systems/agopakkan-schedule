@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import calendar
+import datetime
 import json
 import os
 from urllib.parse import quote
@@ -15,11 +15,7 @@ with open(os.path.join(SCRIPT_DIR, "assets", "avatar_b64.txt")) as f:
     AVATAR_B64 = f.read().strip()
 
 YEAR, MONTH = 2026, 8
-WEEKDAY_LABELS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
 WEEKDAY_JP = ["日", "月", "火", "水", "木", "金", "土"]
-
-cal = calendar.Calendar(firstweekday=6)  # Sunday-start
-weeks = cal.monthdatescalendar(YEAR, MONTH)
 
 PIN_SVG = (
     '<svg class="pin" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true">'
@@ -32,55 +28,35 @@ PIN_SVG = (
 def maps_url(query):
     return f"https://www.google.com/maps/search/?api=1&query={quote(query)}"
 
-def day_cell(d):
-    if d.month != MONTH:
-        return '<td class="day-cell empty"></td>'
-    day_num = d.day
-    wd = d.weekday()  # Mon=0..Sun=6
-    wd_idx = (wd + 1) % 7  # convert to Sun=0..Sat=6
-    is_sun = wd_idx == 0
-    is_sat = wd_idx == 6
-    cls = "day-cell"
-    if is_sun:
-        cls += " is-sun"
-    if is_sat:
-        cls += " is-sat"
+def day_rows_html(day, wd_label, events):
+    rows = ""
+    for i, e in enumerate(events):
+        row_cls = "sched-row" if i == 0 else "sched-row repeat"
+        date_html = f'{day:02d}<span class="wd">({wd_label})</span>'
+        link = maps_url(e["maps"]) if e.get("maps") else None
+        place_html = (
+            f'<a class="place-link" href="{link}" target="_blank" rel="noopener">{PIN_SVG}<span>{e["name"]}</span></a>'
+            if link else f'<span class="place-link plain">{e["name"]}</span>'
+        )
+        rows += (
+            f'<div class="{row_cls}">'
+            f'<div class="cell date">{date_html}</div>'
+            f'<div class="cell time">{e["time"]}</div>'
+            f'<div class="cell place">{place_html}</div>'
+            f'</div>'
+        )
+    return rows
 
-    events = EVENTS.get(day_num, [])
-    events_html = ""
-    if events:
-        real_events = [e for e in events if not e.get("deco_only")]
-        for e in real_events:
-            link = maps_url(e["maps"]) if e.get("maps") else None
-            name_html = (
-                f'<a class="event-name" href="{link}" target="_blank" rel="noopener">{PIN_SVG}<span>{e["name"]}</span></a>'
-                if link else f'<span class="event-name plain">{e["name"]}</span>'
-            )
-            events_html += (
-                f'<div class="event">'
-                f'{name_html}'
-                f'<div class="event-time">{e["time"]}</div>'
-                f'</div>'
-            )
+schedule_html = ""
+for day in sorted(EVENTS.keys()):
+    real_events = [e for e in EVENTS[day] if not e.get("deco_only")]
+    if not real_events:
+        continue
+    wd_label = WEEKDAY_JP[(datetime.date(YEAR, MONTH, day).weekday() + 1) % 7]
+    schedule_html += day_rows_html(day, wd_label, real_events)
 
-    num_color = "sun" if is_sun else ("sat" if is_sat else "")
-    wd_label = f'<span class="wd-label">{WEEKDAY_JP[wd_idx]}</span>' if events else ""
-    has_event_cls = " has-event" if events else ""
-    return (
-        f'<td class="{cls}{has_event_cls}" data-day="{day_num}" data-wd="{WEEKDAY_JP[wd_idx]}">'
-        f'<div class="date-row"><span class="date-num {num_color}">{day_num:02d}</span>{wd_label}</div>'
-        f'<div class="events">{events_html}</div>'
-        f'</td>'
-    )
-
-weeks_html = ""
-for week in weeks:
-    weeks_html += "<tr>" + "".join(day_cell(d) for d in week) + "</tr>\n"
-
-header_html = "".join(
-    f'<th class="{"sat-head" if i==6 else ("sun-head" if i==0 else "")}">{lbl}</th>'
-    for i, lbl in enumerate(WEEKDAY_LABELS)
-)
+if not schedule_html:
+    schedule_html = '<div class="empty-state">この月の出店予定はまだありません。</div>'
 
 # Fallback event data exposed to JS (name/time/maps only) so month navigation
 # can re-show the originally curated August schedule even without a live API key.
@@ -127,7 +103,7 @@ html = f"""<!DOCTYPE html>
     justify-content: center;
   }}
   .poster {{
-    max-width: 920px;
+    max-width: 640px;
     width: 100%;
     background: var(--card);
     border-radius: 20px;
@@ -210,69 +186,63 @@ html = f"""<!DOCTYPE html>
     line-height: 1.9;
   }}
 
-  /* ---------- Calendar ---------- */
-  table.calendar {{
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: separate;
-    border-spacing: 5px;
-  }}
-  table.calendar th {{
+  /* ---------- Schedule list ---------- */
+  .sched-head {{
+    display: grid;
+    grid-template-columns: 84px 116px 1fr;
+    padding: 0 6px 8px;
     color: var(--gray);
-    font-weight: 700;
     font-size: 11px;
-    letter-spacing: 2px;
-    padding: 0 0 10px;
-    text-align: center;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    border-bottom: 2px solid var(--line);
+    margin-bottom: 2px;
   }}
-  table.calendar th.sun-head {{ color: var(--accent); }}
-  table.calendar th.sat-head {{ color: var(--sat); }}
-
-  td.day-cell {{
-    vertical-align: top;
-    width: 14.28%;
-    height: 120px;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 8px 8px 6px;
-    position: relative;
+  .sched-row {{
+    display: grid;
+    grid-template-columns: 84px 116px 1fr;
+    align-items: center;
+    column-gap: 4px;
+    padding: 12px 6px;
+    border-bottom: 1px solid var(--line);
   }}
-  td.day-cell.empty {{ background: transparent; border: 1px dashed var(--line); }}
-  td.day-cell.is-sun {{ background: var(--accent-soft); }}
-  td.day-cell.is-sat {{ background: var(--sat-soft); }}
-  td.day-cell.has-event {{ border-color: #DDD; }}
-
-  .date-row {{ display: flex; align-items: baseline; justify-content: space-between; }}
-  .date-num {{
-    font-family: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
+  .sched-row:last-child {{ border-bottom: none; }}
+  .sched-row .cell.date {{
     font-weight: 700;
     font-size: 14px;
     color: var(--ink);
   }}
-  .date-num.sun {{ color: var(--accent); }}
-  .date-num.sat {{ color: var(--sat); }}
-  .wd-label {{ font-size: 9px; color: var(--gray); }}
-
-  .events {{ margin-top: 7px; }}
-  .event {{ margin-bottom: 7px; }}
-  .event-name {{
+  .sched-row .cell.date .wd {{
+    display: block;
+    font-weight: 500;
+    font-size: 10px;
+    color: var(--gray);
+    margin-top: 1px;
+  }}
+  .sched-row.repeat .cell.date {{ visibility: hidden; }}
+  .sched-row .cell.time {{
+    font-size: 12.5px;
+    color: var(--gray);
+    font-weight: 600;
+  }}
+  .place-link {{
     display: flex;
     align-items: flex-start;
-    gap: 4px;
-    font-size: 10.5px;
-    line-height: 1.35;
+    gap: 5px;
+    font-size: 13px;
+    line-height: 1.4;
     font-weight: 600;
     color: var(--ink);
     text-decoration: none;
   }}
-  .event-name .pin {{ flex: 0 0 auto; margin-top: 3px; color: var(--accent); }}
-  a.event-name:hover span {{ color: var(--accent); text-decoration: underline; }}
-  .event-name.plain {{ color: var(--gray); font-weight: 400; }}
-  .event-time {{
-    font-size: 9.5px;
+  .place-link .pin {{ flex: 0 0 auto; margin-top: 3px; color: var(--accent); }}
+  a.place-link:hover span {{ color: var(--accent); text-decoration: underline; }}
+  .place-link.plain {{ color: var(--gray); font-weight: 400; }}
+  .empty-state {{
+    text-align: center;
     color: var(--gray);
-    margin-top: 2px;
+    font-size: 13px;
+    padding: 40px 0;
   }}
 
   /* ---------- Footer ---------- */
@@ -301,7 +271,7 @@ html = f"""<!DOCTYPE html>
     opacity: 0.7;
   }}
 
-  /* ---------- Mobile: keep all 7 columns on one screen width ---------- */
+  /* ---------- Mobile ---------- */
   @media (max-width: 480px) {{
     body {{ padding: 20px 6px; }}
     .poster {{ border-radius: 16px; }}
@@ -314,17 +284,20 @@ html = f"""<!DOCTYPE html>
     .body-pad {{ padding: 16px 8px 18px; }}
     .subnote {{ font-size: 9.5px; padding: 8px 8px; margin: 0 0 14px; }}
 
-    table.calendar {{ border-spacing: 2px; }}
-    table.calendar th {{ font-size: 8px; letter-spacing: 0.5px; padding: 0 0 6px; }}
-
-    td.day-cell {{ height: 88px; padding: 3px 3px 2px; border-radius: 6px; }}
-    .date-num {{ font-size: 10px; }}
-    .wd-label {{ font-size: 6.5px; }}
-    .events {{ margin-top: 2px; }}
-    .event {{ margin-bottom: 3px; }}
-    .event-name {{ font-size: 6.8px; gap: 1px; line-height: 1.15; }}
-    .event-name .pin {{ width: 6px; height: 6px; margin-top: 1px; }}
-    .event-time {{ font-size: 6px; margin-top: 0; }}
+    .sched-head {{ display: none; }}
+    .sched-row {{
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      column-gap: 8px;
+      padding: 9px 4px;
+    }}
+    .sched-row.repeat .cell.date {{ visibility: visible; }}
+    .sched-row .cell.date {{ order: 1; font-size: 12px; }}
+    .sched-row .cell.date .wd {{ display: inline; margin-left: 3px; }}
+    .sched-row .cell.time {{ order: 2; font-size: 11px; }}
+    .sched-row .cell.place {{ order: 3; flex: 1 1 100%; margin-top: 3px; }}
+    .place-link {{ font-size: 11.5px; }}
 
     .footer {{ margin-top: 10px; }}
     .signoff {{ font-size: 13px; }}
@@ -348,16 +321,14 @@ html = f"""<!DOCTYPE html>
 
     <div class="body-pad">
       <div class="subnote">
-        出店場所名をタップ／クリックすると、Google マップで場所を確認できます（別タブで開きます）。<br>
+        場所名をタップ／クリックすると、Google マップで確認できます（別タブで開きます）。<br>
         ※ ‹ › ボタンで表示する月を切り替えられます。Googleカレンダー連携時は、切り替えた月の最新の予定を自動取得します。
       </div>
 
-      <table class="calendar">
-        <thead><tr>{header_html}</tr></thead>
-        <tbody id="calendarBody">
-          {weeks_html}
-        </tbody>
-      </table>
+      <div class="sched-head"><span>DATE</span><span>TIME</span><span>PLACE</span></div>
+      <div id="scheduleList">
+        {schedule_html}
+      </div>
 
       <div class="footer">
         <div class="line"></div>
@@ -380,7 +351,7 @@ html = f"""<!DOCTYPE html>
   // 2. 下の apiKey に貼り付けて保存すれば、ページを開く・月を切り替えるたびに
   //    その月のGoogleカレンダーの予定を自動取得してこのカレンダーに反映します。
   // 3. APIキーが未設定の間は、8月のみ生成時点の予定（フォールバック）を表示し、
-  //    他の月は空欄のカレンダー枠だけを表示します。
+  //    他の月は空欄表示です。
   // ---------------------------------------------------------------
   const CONFIG = {{
     apiKey: "{GOOGLE_CALENDAR_API_KEY}", // config.py の GOOGLE_CALENDAR_API_KEY を編集してください
@@ -443,66 +414,55 @@ html = f"""<!DOCTYPE html>
     }};
   }}
 
-  function renderCell(td, evs) {{
-    var wd = td.dataset.wd || "";
-    var day = parseInt(td.dataset.day, 10);
-    var numColor = td.classList.contains("is-sun") ? "sun" : (td.classList.contains("is-sat") ? "sat" : "");
-    var eventsHtml = "";
-    evs.forEach(function(e) {{
-      var link = e.mapsQuery ? mapsUrl(e.mapsQuery) : null;
-      var nameHtml = link
-        ? '<a class="event-name" href="' + link + '" target="_blank" rel="noopener">' + pinSvg() + '<span>' + escapeHtml(e.name) + '</span></a>'
-        : '<span class="event-name plain">' + escapeHtml(e.name) + '</span>';
-      eventsHtml += '<div class="event">' + nameHtml + '<div class="event-time">' + escapeHtml(e.time) + '</div></div>';
-    }});
-    var wdLabel = evs.length ? ('<span class="wd-label">' + wd + '</span>') : "";
-    td.classList.toggle("has-event", evs.length > 0);
-    td.innerHTML = '<div class="date-row"><span class="date-num ' + numColor + '">' + pad2(day) + '</span>' + wdLabel + '</div>'
-      + '<div class="events">' + eventsHtml + '</div>';
-  }}
+  function buildScheduleHtml(year, month, byDay) {{
+    var days = Object.keys(byDay)
+      .map(Number)
+      .filter(function(d) {{ return byDay[d] && byDay[d].length; }})
+      .sort(function(a, b) {{ return a - b; }});
 
-  function buildGridHtml(year, month) {{
-    var first = new Date(year, month - 1, 1);
-    var startWd = first.getDay(); // 0=Sun..6=Sat
-    var daysInMonth = new Date(year, month, 0).getDate();
-    var cells = [];
-    for (var i = 0; i < startWd; i++) cells.push(null);
-    for (var d = 1; d <= daysInMonth; d++) cells.push(d);
-    while (cells.length % 7 !== 0) cells.push(null);
+    if (!days.length) {{
+      return '<div class="empty-state">この月の出店予定はまだありません。</div>';
+    }}
 
     var html = "";
-    for (var r = 0; r < cells.length; r += 7) {{
-      html += "<tr>";
-      for (var c = 0; c < 7; c++) {{
-        var day = cells[r + c];
-        if (day === null) {{
-          html += '<td class="day-cell empty"></td>';
-        }} else {{
-          var isSun = c === 0, isSat = c === 6;
-          var cls = "day-cell" + (isSun ? " is-sun" : "") + (isSat ? " is-sat" : "");
-          var numColor = isSun ? "sun" : (isSat ? "sat" : "");
-          html += '<td class="' + cls + '" data-day="' + day + '" data-wd="' + WD_JP[c] + '">'
-            + '<div class="date-row"><span class="date-num ' + numColor + '">' + pad2(day) + '</span></div>'
-            + '<div class="events"></div></td>';
-        }}
-      }}
-      html += "</tr>";
-    }}
+    days.forEach(function(day) {{
+      var wd = WD_JP[new Date(year, month - 1, day).getDay()];
+      byDay[day].forEach(function(e, i) {{
+        var link = e.mapsQuery ? mapsUrl(e.mapsQuery) : null;
+        var placeHtml = link
+          ? '<a class="place-link" href="' + link + '" target="_blank" rel="noopener">' + pinSvg() + '<span>' + escapeHtml(e.name) + '</span></a>'
+          : '<span class="place-link plain">' + escapeHtml(e.name) + '</span>';
+        var rowCls = "sched-row" + (i === 0 ? "" : " repeat");
+        var dateHtml = pad2(day) + '<span class="wd">(' + wd + ')</span>';
+        html += '<div class="' + rowCls + '">'
+          + '<div class="cell date">' + dateHtml + '</div>'
+          + '<div class="cell time">' + escapeHtml(e.time) + '</div>'
+          + '<div class="cell place">' + placeHtml + '</div>'
+          + '</div>';
+      }});
+    }});
     return html;
+  }}
+
+  function renderSchedule(year, month, byDay) {{
+    document.getElementById("scheduleList").innerHTML = buildScheduleHtml(year, month, byDay);
   }}
 
   function loadMonth(year, month) {{
     currentYear = year;
     currentMonth = month;
-    document.getElementById("calendarBody").innerHTML = buildGridHtml(year, month);
     document.getElementById("monthBanner").textContent = year + "年" + month + "月 出店スケジュール";
 
     if (year === FALLBACK_YEAR && month === FALLBACK_MONTH) {{
-      document.querySelectorAll("td.day-cell[data-day]").forEach(function(td) {{
-        var raw = FALLBACK_EVENTS[td.dataset.day] || [];
-        var evs = raw.map(function(e) {{ return {{ name: e.name, time: e.time, mapsQuery: e.maps || e.name }}; }});
-        renderCell(td, evs);
+      var byDay = {{}};
+      Object.keys(FALLBACK_EVENTS).forEach(function(d) {{
+        byDay[d] = FALLBACK_EVENTS[d].map(function(e) {{
+          return {{ name: e.name, time: e.time, mapsQuery: e.maps || e.name }};
+        }});
       }});
+      renderSchedule(year, month, byDay);
+    }} else {{
+      document.getElementById("scheduleList").innerHTML = '<div class="empty-state">読み込み中…</div>';
     }}
 
     refreshForMonth(year, month);
@@ -547,13 +507,6 @@ html = f"""<!DOCTYPE html>
     }} catch (e) {{ /* localStorage無効時は無視してその都度取得 */ }}
   }}
 
-  function renderByDay(byDay) {{
-    document.querySelectorAll("td.day-cell[data-day]").forEach(function(td) {{
-      var day = parseInt(td.dataset.day, 10);
-      renderCell(td, byDay[day] || []);
-    }});
-  }}
-
   async function refreshForMonth(year, month) {{
     if (!CONFIG.apiKey || CONFIG.apiKey.indexOf("YOUR_") === 0) {{
       console.log("[あごぱっかーんカレンダー] Google Calendar APIキー未設定のため、" + year + "年" + month + "月はフォールバック／空欄表示です。");
@@ -562,7 +515,7 @@ html = f"""<!DOCTYPE html>
     var today = todayJst();
     var cached = readCache(year, month);
     if (cached && cached.date === today) {{
-      renderByDay(cached.byDay);
+      renderSchedule(year, month, cached.byDay);
       console.log("[あごぱっかーんカレンダー] " + year + "年" + month + "月は本日(" + today + ")取得済みのキャッシュを表示中です。");
       return;
     }}
@@ -590,13 +543,13 @@ html = f"""<!DOCTYPE html>
         (byDay[info.day] = byDay[info.day] || []).push(info);
       }});
       writeCache(year, month, byDay);
-      renderByDay(byDay);
+      renderSchedule(year, month, byDay);
       console.log("[あごぱっかーんカレンダー] " + year + "年" + month + "月の最新の予定を取得し、本日分としてキャッシュしました。");
     }} catch (err) {{
       if (mySeq !== requestSeq) return;
       console.warn("[あごぱっかーんカレンダー] Googleカレンダーの取得に失敗しました。", err);
       if (cached) {{
-        renderByDay(cached.byDay); // 取得失敗時は古いキャッシュがあればそれで表示
+        renderSchedule(year, month, cached.byDay); // 取得失敗時は古いキャッシュがあればそれで表示
       }}
     }}
   }}
