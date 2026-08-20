@@ -8,9 +8,6 @@ from config import GOOGLE_CALENDAR_API_KEY, GOOGLE_CALENDAR_ID
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-with open(os.path.join(SCRIPT_DIR, "assets", "logo_b64.txt")) as f:
-    LOGO_B64 = f.read().strip()
-
 with open(os.path.join(SCRIPT_DIR, "assets", "top_b64.txt")) as f:
     TOP_LOGO_B64 = f.read().strip()
 
@@ -371,17 +368,7 @@ html = f"""<!DOCTYPE html>
     text-align: center;
     line-height: 1.9;
     margin-top: 18px;
-    padding: 0 30px;
-  }}
-  .credit {{
-    text-align: right;
-    margin-top: 12px;
     padding: 0 30px 24px;
-  }}
-  .credit-logo {{
-    height: 15.6px;
-    width: auto;
-    opacity: 0.7;
   }}
 
   /* ---------- Mobile ---------- */
@@ -420,9 +407,7 @@ html = f"""<!DOCTYPE html>
     .footer-bar {{ margin-top: 16px; padding: 12px 14px; flex-wrap: wrap; row-gap: 4px; }}
     .footer-bar .fb-side {{ font-size: 8.5px; }}
     .footer-bar .fb-mid {{ font-size: 12px; flex: 1 1 100%; order: -1; }}
-    .footnotes {{ font-size: 8.5px; padding: 0 12px; }}
-    .credit {{ margin-top: 10px; padding: 0 12px 12px; }}
-    .credit-logo {{ height: 12px; }}
+    .footnotes {{ font-size: 8.5px; padding: 0 12px 12px; }}
   }}
 </style>
 </head>
@@ -474,9 +459,6 @@ html = f"""<!DOCTYPE html>
     </div>
     <div class="footnotes">
       天候や状況により、変更・中止となる場合がございます。最新情報はSNSをご確認ください。
-    </div>
-    <div class="credit">
-      <img class="credit-logo" src="data:image/png;base64,{LOGO_B64}" alt="IMT-Systems">
     </div>
   </div>
 
