@@ -11,11 +11,14 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(SCRIPT_DIR, "assets", "logo_b64.txt")) as f:
     LOGO_B64 = f.read().strip()
 
-with open(os.path.join(SCRIPT_DIR, "assets", "avatar_b64.txt")) as f:
-    AVATAR_B64 = f.read().strip()
-
 with open(os.path.join(SCRIPT_DIR, "assets", "top_b64.txt")) as f:
     TOP_LOGO_B64 = f.read().strip()
+
+with open(os.path.join(SCRIPT_DIR, "assets", "photo1_b64.txt")) as f:
+    PHOTO1_B64 = f.read().strip()
+
+with open(os.path.join(SCRIPT_DIR, "assets", "photo2_b64.txt")) as f:
+    PHOTO2_B64 = f.read().strip()
 
 YEAR, MONTH = 2026, 8
 WEEKDAY_JP = ["日", "月", "火", "水", "木", "金", "土"]
@@ -138,15 +141,6 @@ html = f"""<!DOCTYPE html>
     gap: 8px;
     margin-bottom: 4px;
   }}
-  .brand-badge {{
-    width: 62px; height: 62px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 3px solid #fff;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-    flex: 0 0 auto;
-  }}
-  .brand-badge img {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
   .tagline {{
     padding-top: 8px;
     font-family: 'Kalam', cursive;
@@ -168,6 +162,29 @@ html = f"""<!DOCTYPE html>
     border: 1.5px dashed var(--green);
     transform: rotate(6deg);
   }}
+  .hero-photos {{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin: 6px 0 4px;
+  }}
+  .hero-center {{
+    flex: 0 1 auto;
+    min-width: 0;
+  }}
+  .hero-photo {{
+    flex: 0 0 auto;
+    width: 92px;
+    aspect-ratio: 3 / 4;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 4px solid #fff;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+  }}
+  .hero-photo.left {{ transform: rotate(-5deg); }}
+  .hero-photo.right {{ transform: rotate(5deg); }}
+  .hero-photo img {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
   .avatar {{
     width: 84px; height: 84px;
     margin: 4px auto 10px;
@@ -371,10 +388,11 @@ html = f"""<!DOCTYPE html>
     body {{ padding: 20px 6px; }}
     .poster {{ border-radius: 16px; }}
     .hero {{ padding: 16px 14px 22px; }}
-    .brand-badge {{ width: 46px; height: 46px; }}
     .tagline-text {{ font-size: 11.5px; }}
     .tagline-stars {{ font-size: 8px; }}
     .side-badge {{ width: 54px; font-size: 7px; padding: 5px 3px; }}
+    .hero-photos {{ gap: 6px; margin: 4px 0 2px; }}
+    .hero-photo {{ width: 58px; }}
     .avatar {{ width: 64px; height: 64px; margin-bottom: 8px; }}
     .brand {{ font-size: clamp(22px, 8vw, 28px); margin-bottom: 8px; }}
     .ribbon {{ font-size: 10px; padding: 5px 16px; margin-bottom: 14px; }}
@@ -409,7 +427,6 @@ html = f"""<!DOCTYPE html>
   <div class="poster">
     <div class="hero">
       <div class="hero-top">
-        <div class="brand-badge"><img src="data:image/jpeg;base64,{TOP_LOGO_B64}" alt="あごぱっかーん"></div>
         <div class="tagline">
           <span class="tagline-text">Always Fresh &amp; Delicious!</span>
           <span class="tagline-stars">★ ★ ★</span>
@@ -417,7 +434,13 @@ html = f"""<!DOCTYPE html>
         <div class="side-badge">GOOD BURGER<br>GOOD VIBES</div>
       </div>
 
-      <div class="avatar"><img src="data:image/png;base64,{AVATAR_B64}" alt="agopakkan"></div>
+      <div class="hero-photos">
+        <div class="hero-photo left"><img src="data:image/jpeg;base64,{PHOTO1_B64}" alt="あごぱっかーんバーガー"></div>
+        <div class="hero-center">
+          <div class="avatar"><img src="data:image/jpeg;base64,{TOP_LOGO_B64}" alt="あごぱっかーん"></div>
+        </div>
+        <div class="hero-photo right"><img src="data:image/jpeg;base64,{PHOTO2_B64}" alt="あごぱっかーんバーガー"></div>
+      </div>
       <h1 class="brand">あごぱっかーん</h1>
       <div class="ribbon">★ BURGER TIME! ★</div>
       <div class="month-nav">
