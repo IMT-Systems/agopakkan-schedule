@@ -8,8 +8,8 @@ from config import GOOGLE_CALENDAR_API_KEY, GOOGLE_CALENDAR_ID
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-with open(os.path.join(SCRIPT_DIR, "assets", "avatar_b64.txt")) as f:
-    AVATAR_B64 = f.read().strip()
+with open(os.path.join(SCRIPT_DIR, "assets", "top_b64.txt")) as f:
+    TOP_LOGO_B64 = f.read().strip()
 
 with open(os.path.join(SCRIPT_DIR, "assets", "photo1_b64.txt")) as f:
     PHOTO1_B64 = f.read().strip()
@@ -271,21 +271,21 @@ html = f"""<!DOCTYPE html>
 
   .subnote {{
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 10px;
     text-align: left;
-    font-size: 11px;
+    font-size: 15px;
     color: var(--gray);
     background: #FAFAFA;
     border: 1px solid var(--line);
     border-radius: 10px;
-    padding: 12px 14px;
+    padding: 14px 16px;
     margin: 0 0 22px;
-    line-height: 1.9;
+    line-height: 1.6;
   }}
   .subnote .subnote-pin {{
     flex: 0 0 auto;
-    width: 18px; height: 18px;
+    width: 22px; height: 22px;
     margin-top: 1px;
     color: var(--green);
   }}
@@ -390,7 +390,7 @@ html = f"""<!DOCTYPE html>
     .hero {{ min-height: 650px; border-radius: 0; margin: 0 0 20px; }}
     .catch {{ left: 15px; top: 25px; font-size: 14px; }}
     .stars {{ font-size: 11px; }}
-    .avatar {{ display: none; }}
+    .avatar {{ width: 55px; height: 55px; top: 15px; right: 135px; border-width: 3px; }}
     .beef {{ right: 10px; top: 15px; padding: 8px 12px; font-size: 11px; border-width: 2px; }}
     .burger {{ left: -80px; bottom: 30px; width: 70%; }}
     .title {{ top: 180px; right: 15px; font-size: 45px; letter-spacing: -3px; }}
@@ -402,8 +402,8 @@ html = f"""<!DOCTYPE html>
   @media (max-width: 480px) {{
     .panel {{ border-radius: 0; }}
     .body-pad {{ padding: 16px 8px 4px; }}
-    .subnote {{ font-size: 9.5px; padding: 9px 10px; margin: 0 0 14px; }}
-    .subnote .subnote-pin {{ width: 14px; height: 14px; }}
+    .subnote {{ font-size: 12px; padding: 11px 12px; margin: 0 0 14px; }}
+    .subnote .subnote-pin {{ width: 17px; height: 17px; }}
 
     .day-card {{ padding: 10px 12px; border-radius: 10px; margin-bottom: 8px; }}
     .day-card-head {{ font-size: 13.5px; padding-bottom: 6px; margin-bottom: 6px; }}
@@ -431,7 +431,7 @@ html = f"""<!DOCTYPE html>
       <div class="stars">★ ★ ★</div>
     </div>
 
-    <div class="avatar"><img src="data:image/png;base64,{AVATAR_B64}" alt="あごぱっかーん"></div>
+    <div class="avatar"><img src="data:image/jpeg;base64,{TOP_LOGO_B64}" alt="あごぱっかーん"></div>
 
     <div class="beef">100% BEEF<br>100% SMILE.</div>
 
@@ -453,8 +453,7 @@ html = f"""<!DOCTYPE html>
       <div class="subnote">
         {PIN_SVG.replace('class="pin"', 'class="subnote-pin"')}
         <span>
-          場所名をタップ／クリックすると、Google マップで確認できます（別タブで開きます）。<br>
-          ※ ‹ › ボタンで表示する月を切り替えられます。Googleカレンダー連携時は、切り替えた月の最新の予定を自動取得します。
+          場所名をタップ／クリックすると、Google マップで確認できます（別タブで開きます）。
         </span>
       </div>
 
