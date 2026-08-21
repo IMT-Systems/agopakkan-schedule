@@ -8,9 +8,6 @@ from config import GOOGLE_CALENDAR_API_KEY, GOOGLE_CALENDAR_ID
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-with open(os.path.join(SCRIPT_DIR, "assets", "top_b64.txt")) as f:
-    TOP_LOGO_B64 = f.read().strip()
-
 with open(os.path.join(SCRIPT_DIR, "assets", "avatar_b64.txt")) as f:
     AVATAR_B64 = f.read().strip()
 
@@ -139,25 +136,10 @@ html = f"""<!DOCTYPE html>
     opacity: .25;
     pointer-events: none;
   }}
-  .logo {{
-    position: absolute;
-    top: 30px;
-    left: 35px;
-    width: 190px;
-    height: 190px;
-    border: 8px solid #f7e3af;
-    border-radius: 50%;
-    background: #f7e3af;
-    overflow: hidden;
-    transform: rotate(-5deg);
-    box-shadow: 0 5px 12px rgba(0,0,0,.25);
-    z-index: 5;
-  }}
-  .logo img {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
   .catch {{
     position: absolute;
     top: 40px;
-    left: 250px;
+    left: 45px;
     color: #214d28;
     font-family: 'Kalam', cursive;
     font-size: 32px;
@@ -406,8 +388,7 @@ html = f"""<!DOCTYPE html>
   /* ---------- Mobile ---------- */
   @media (max-width: 900px) {{
     .hero {{ min-height: 650px; border-radius: 0; margin: 0 0 20px; }}
-    .logo {{ width: 100px; height: 100px; left: 15px; top: 15px; border-width: 4px; }}
-    .catch {{ left: 130px; top: 25px; font-size: 14px; }}
+    .catch {{ left: 15px; top: 25px; font-size: 14px; }}
     .stars {{ font-size: 11px; }}
     .avatar {{ display: none; }}
     .beef {{ right: 10px; top: 15px; padding: 8px 12px; font-size: 11px; border-width: 2px; }}
@@ -444,8 +425,6 @@ html = f"""<!DOCTYPE html>
 </head>
 <body>
   <section class="hero">
-    <div class="logo"><img src="data:image/jpeg;base64,{TOP_LOGO_B64}" alt="あごぱっかーん"></div>
-
     <div class="catch">
       Always<br>
       Fresh &amp; Delicious!
