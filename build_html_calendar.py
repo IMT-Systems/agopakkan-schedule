@@ -11,6 +11,9 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(SCRIPT_DIR, "assets", "top_b64.txt")) as f:
     TOP_LOGO_B64 = f.read().strip()
 
+with open(os.path.join(SCRIPT_DIR, "assets", "avatar_b64.txt")) as f:
+    AVATAR_B64 = f.read().strip()
+
 with open(os.path.join(SCRIPT_DIR, "assets", "photo1_b64.txt")) as f:
     PHOTO1_B64 = f.read().strip()
 
@@ -89,170 +92,199 @@ html = f"""<!DOCTYPE html>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Kalam:wght@400;700&family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {{
-    --bg: #F3F3F1;
-    --card: #FFFFFF;
+    --bg: #F3EFE7;
     --ink: #241A10;
     --gray: #767676;
     --line: #EAEAEA;
     --accent: #FF5A1F;
-    --accent-soft: #FFF0E8;
     --sat: #2563EB;
     --green: #23814B;
-    --green-dark: #185F38;
-    --ribbon: #E2402D;
-    --grad-top: #FFDE59;
-    --grad-mid: #FFB627;
     --grad-bottom: #FF9A1E;
     --schedule-bg: #FFF7DC;
   }}
   * {{ box-sizing: border-box; }}
   body {{
     margin: 0;
-    padding: 40px 16px;
     background: var(--bg);
-    font-family: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
+    font-family: "Arial Black", "Noto Sans JP", sans-serif;
     color: var(--ink);
-    display: flex;
-    justify-content: center;
   }}
-  .poster {{
-    max-width: 640px;
+
+  /* ---------- Hero (burger poster) ---------- */
+  .hero {{
+    position: relative;
     width: 100%;
-    background: var(--card);
+    max-width: 1100px;
+    min-height: 700px;
+    margin: 30px auto;
+    overflow: hidden;
+    background: linear-gradient(135deg, #d87513 0%, #f39a22 45%, #ffb52d 100%);
+    border-radius: 28px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.18);
+  }}
+  .hero::before {{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-conic-gradient(from -10deg, rgba(255,255,255,.08) 0deg 12deg, transparent 12deg 30deg);
+    opacity: .7;
+    pointer-events: none;
+  }}
+  .hero::after {{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(80,40,0,.18) 1px, transparent 1px);
+    background-size: 6px 6px;
+    opacity: .25;
+    pointer-events: none;
+  }}
+  .logo {{
+    position: absolute;
+    top: 30px;
+    left: 35px;
+    width: 190px;
+    height: 190px;
+    border: 8px solid #f7e3af;
+    border-radius: 50%;
+    background: #f7e3af;
+    overflow: hidden;
+    transform: rotate(-5deg);
+    box-shadow: 0 5px 12px rgba(0,0,0,.25);
+    z-index: 5;
+  }}
+  .logo img {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
+  .catch {{
+    position: absolute;
+    top: 40px;
+    left: 250px;
+    color: #214d28;
+    font-family: 'Kalam', cursive;
+    font-size: 32px;
+    font-weight: bold;
+    transform: rotate(-3deg);
+    z-index: 3;
+  }}
+  .stars {{
+    margin-top: 8px;
+    color: #c92e1f;
+    font-size: 24px;
+    letter-spacing: 8px;
+  }}
+  .avatar {{
+    position: absolute;
+    top: 30px;
+    right: 320px;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: #f6d36c;
+    border: 8px solid #f8e6b5;
+    overflow: hidden;
+    z-index: 5;
+  }}
+  .avatar img {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
+  .beef {{
+    position: absolute;
+    right: 35px;
+    top: 35px;
+    z-index: 5;
+    padding: 18px 30px;
+    color: #8e2618;
+    background: #f5d47c;
+    border: 5px solid #8e2618;
+    font-size: 25px;
+    font-weight: 900;
+    transform: rotate(-7deg);
+    text-align: center;
+  }}
+  .burger {{
+    position: absolute;
+    left: -30px;
+    bottom: -40px;
+    width: 57%;
+    max-width: 850px;
+    z-index: 2;
+    filter: drop-shadow(12px 18px 12px rgba(0,0,0,.35));
+  }}
+  .burger img {{ display: block; width: 100%; height: auto; border-radius: 20px; }}
+  .title {{
+    position: absolute;
+    top: 230px;
+    right: 50px;
+    z-index: 5;
+    margin: 0;
+    color: #7d2016;
+    font-size: clamp(45px, 6vw, 90px);
+    font-weight: 900;
+    letter-spacing: -4px;
+    text-shadow: 4px 4px 0 #f8e6b5, 7px 7px 0 rgba(100,30,0,.35);
+    white-space: nowrap;
+  }}
+  .burger-time {{
+    position: absolute;
+    right: 50px;
+    top: 370px;
+    z-index: 5;
+    min-width: 460px;
+    padding: 24px 45px;
+    background: #bd2419;
+    color: white;
+    text-align: center;
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    transform: rotate(-2deg);
+    border: 7px solid #f8e6b5;
+    box-shadow: 0 8px 0 rgba(100,30,0,.35);
+    clip-path: polygon(3% 0, 97% 0, 100% 50%, 97% 100%, 3% 100%, 0 50%);
+  }}
+  .schedule {{
+    position: absolute;
+    right: 60px;
+    bottom: 45px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }}
+  .schedule button {{
+    width: 56px;
+    height: 56px;
+    border: 0;
+    border-radius: 50%;
+    background: #f8e6b5;
+    color: #222;
+    font-size: 34px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,.25);
+    transition: .2s;
+  }}
+  .schedule button:hover {{ transform: scale(1.1); }}
+  .schedule-title {{
+    padding: 20px 40px;
+    min-width: 400px;
+    border-radius: 50px;
+    background: #126b38;
+    color: white;
+    text-align: center;
+    font-size: 26px;
+    font-weight: 900;
+    box-shadow: 0 6px 10px rgba(0,0,0,.25);
+  }}
+
+  /* ---------- Content panel ---------- */
+  .panel {{
+    max-width: 1100px;
+    margin: 0 auto 30px;
+    background: #fff;
     border-radius: 20px;
     overflow: hidden;
     border: 1px solid var(--line);
     box-shadow: 0 20px 50px rgba(0,0,0,0.06);
-  }}
-
-  /* ---------- Header (poster style) ---------- */
-  .hero {{
-    position: relative;
-    padding: 22px 22px 30px;
-    text-align: center;
-    background: linear-gradient(180deg, var(--grad-top) 0%, var(--grad-mid) 55%, var(--grad-bottom) 100%);
-  }}
-  .hero-top {{
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 4px;
-  }}
-  .tagline {{
-    padding-top: 8px;
-    font-family: 'Kalam', cursive;
-    color: var(--green-dark);
-  }}
-  .tagline-text {{ display: block; font-size: 15px; font-weight: 700; }}
-  .tagline-stars {{ display: block; font-size: 10px; letter-spacing: 3px; color: var(--ribbon); margin-top: 2px; }}
-  .side-badge {{
-    flex: 0 0 auto;
-    width: 68px;
-    background: #fff;
-    color: var(--green-dark);
-    font-weight: 800;
-    font-size: 8.5px;
-    line-height: 1.5;
-    text-align: center;
-    padding: 7px 4px;
-    border-radius: 10px;
-    border: 1.5px dashed var(--green);
-    transform: rotate(6deg);
-  }}
-  .hero-photos {{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 22px;
-    margin: 10px 0 8px;
-  }}
-  .hero-center {{
-    flex: 0 1 auto;
-    min-width: 0;
-  }}
-  .hero-photo {{
-    flex: 0 0 auto;
-    width: 184px;
-    aspect-ratio: 3 / 4;
-    border-radius: 16px;
-    overflow: hidden;
-    border: 6px solid #fff;
-    box-shadow: 0 14px 28px rgba(0,0,0,0.3);
-  }}
-  .hero-photo.left {{ transform: rotate(-10deg) translateY(6px); }}
-  .hero-photo.right {{ transform: rotate(10deg) translateY(-6px); }}
-  .hero-photo img {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
-  .avatar {{
-    width: 84px; height: 84px;
-    margin: 4px auto 10px;
-    border-radius: 50%;
-    border: 3px solid #fff;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    overflow: hidden;
-  }}
-  .avatar img {{
-    width: 100%; height: 100%;
-    object-fit: cover;
-    display: block;
-  }}
-  .brand {{
     font-family: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
-    font-weight: 800;
-    color: var(--ink);
-    font-size: clamp(30px, 7vw, 42px);
-    letter-spacing: -0.5px;
-    margin: 0 0 12px;
-    text-shadow: 0 2px 0 rgba(255,255,255,0.35);
   }}
-  .ribbon {{
-    display: inline-block;
-    background: var(--ribbon);
-    color: #fff;
-    font-weight: 800;
-    font-size: 12px;
-    letter-spacing: 1px;
-    padding: 7px 22px;
-    border-radius: 3px;
-    margin-bottom: 18px;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-  }}
-  .month-banner {{
-    display: inline-block;
-    background: var(--green);
-    color: #fff;
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 0.5px;
-    padding: 8px 22px;
-    border-radius: 20px;
-    min-width: 170px;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.12);
-  }}
-  .month-nav {{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-  }}
-  .nav-btn {{
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    border: none;
-    background: #fff;
-    color: var(--ink);
-    font-size: 16px;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    padding: 0;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.12);
-    transition: background 0.15s, color 0.15s;
-  }}
-  .nav-btn:hover {{ background: var(--green); color: #fff; }}
-
   .body-pad {{ padding: 26px 30px 30px; }}
 
   .subnote {{
@@ -296,7 +328,7 @@ html = f"""<!DOCTYPE html>
     margin-bottom: 9px;
     border-bottom: 1px solid var(--line);
   }}
-  .day-card-head .daynum.sun {{ color: var(--ribbon); }}
+  .day-card-head .daynum.sun {{ color: #E2402D; }}
   .day-card-head .daynum.sat {{ color: var(--sat); }}
   .day-card-head .wd {{
     font-size: 11px;
@@ -372,23 +404,22 @@ html = f"""<!DOCTYPE html>
   }}
 
   /* ---------- Mobile ---------- */
+  @media (max-width: 900px) {{
+    .hero {{ min-height: 650px; border-radius: 0; margin: 0 0 20px; }}
+    .logo {{ width: 100px; height: 100px; left: 15px; top: 15px; border-width: 4px; }}
+    .catch {{ left: 130px; top: 25px; font-size: 14px; }}
+    .stars {{ font-size: 11px; }}
+    .avatar {{ display: none; }}
+    .beef {{ right: 10px; top: 15px; padding: 8px 12px; font-size: 11px; border-width: 2px; }}
+    .burger {{ left: -80px; bottom: 30px; width: 70%; }}
+    .title {{ top: 180px; right: 15px; font-size: 45px; letter-spacing: -3px; }}
+    .burger-time {{ right: 15px; top: 280px; min-width: 0; width: 55%; padding: 15px 10px; font-size: 20px; border-width: 4px; }}
+    .schedule {{ right: 15px; bottom: 20px; gap: 8px; }}
+    .schedule-title {{ min-width: 0; padding: 14px 20px; font-size: 16px; }}
+    .schedule button {{ width: 45px; height: 45px; font-size: 25px; }}
+  }}
   @media (max-width: 480px) {{
-    body {{ padding: 20px 6px; }}
-    .poster {{ border-radius: 16px; }}
-    .hero {{ padding: 16px 14px 22px; }}
-    .tagline-text {{ font-size: 11.5px; }}
-    .tagline-stars {{ font-size: 8px; }}
-    .side-badge {{ width: 54px; font-size: 7px; padding: 5px 3px; }}
-    .hero-photos {{ gap: 10px; margin: 6px 0 4px; }}
-    .hero-photo {{ width: 116px; border-width: 4px; }}
-    .hero-photo.left {{ transform: rotate(-9deg) translateY(4px); }}
-    .hero-photo.right {{ transform: rotate(9deg) translateY(-4px); }}
-    .avatar {{ width: 64px; height: 64px; margin-bottom: 8px; }}
-    .brand {{ font-size: clamp(22px, 8vw, 28px); margin-bottom: 8px; }}
-    .ribbon {{ font-size: 10px; padding: 5px 16px; margin-bottom: 14px; }}
-    .month-banner {{ font-size: 11px; padding: 6px 16px; min-width: 130px; }}
-    .nav-btn {{ width: 27px; height: 27px; font-size: 13px; }}
-    .month-nav {{ gap: 6px; }}
+    .panel {{ border-radius: 0; }}
     .body-pad {{ padding: 16px 8px 4px; }}
     .subnote {{ font-size: 9.5px; padding: 9px 10px; margin: 0 0 14px; }}
     .subnote .subnote-pin {{ width: 14px; height: 14px; }}
@@ -412,32 +443,33 @@ html = f"""<!DOCTYPE html>
 </style>
 </head>
 <body>
-  <div class="poster">
-    <div class="hero">
-      <div class="hero-top">
-        <div class="tagline">
-          <span class="tagline-text">Always Fresh &amp; Delicious!</span>
-          <span class="tagline-stars">★ ★ ★</span>
-        </div>
-        <div class="side-badge">GOOD BURGER<br>GOOD VIBES</div>
-      </div>
+  <section class="hero">
+    <div class="logo"><img src="data:image/jpeg;base64,{TOP_LOGO_B64}" alt="あごぱっかーん"></div>
 
-      <div class="hero-photos">
-        <div class="hero-photo left"><img src="data:image/jpeg;base64,{PHOTO1_B64}" alt="あごぱっかーんバーガー"></div>
-        <div class="hero-center">
-          <div class="avatar"><img src="data:image/jpeg;base64,{TOP_LOGO_B64}" alt="あごぱっかーん"></div>
-        </div>
-        <div class="hero-photo right"><img src="data:image/jpeg;base64,{PHOTO2_B64}" alt="あごぱっかーんバーガー"></div>
-      </div>
-      <h1 class="brand">あごぱっかーん</h1>
-      <div class="ribbon">★ BURGER TIME! ★</div>
-      <div class="month-nav">
-        <button type="button" class="nav-btn" id="prevMonthBtn" aria-label="前の月">‹</button>
-        <div class="month-banner" id="monthBanner">{YEAR}年{MONTH}月 出店スケジュール</div>
-        <button type="button" class="nav-btn" id="nextMonthBtn" aria-label="次の月">›</button>
-      </div>
+    <div class="catch">
+      Always<br>
+      Fresh &amp; Delicious!
+      <div class="stars">★ ★ ★</div>
     </div>
 
+    <div class="avatar"><img src="data:image/png;base64,{AVATAR_B64}" alt="あごぱっかーん"></div>
+
+    <div class="beef">100% BEEF<br>100% SMILE.</div>
+
+    <div class="burger"><img src="data:image/jpeg;base64,{PHOTO1_B64}" alt="あごぱっかーんバーガー"></div>
+
+    <h1 class="title">あごぱっかーん</h1>
+
+    <div class="burger-time">★ BURGER TIME! ★</div>
+
+    <div class="schedule">
+      <button type="button" id="prevMonthBtn" aria-label="前の月">‹</button>
+      <div class="schedule-title" id="monthBanner">{YEAR}年{MONTH}月 出店スケジュール</div>
+      <button type="button" id="nextMonthBtn" aria-label="次の月">›</button>
+    </div>
+  </section>
+
+  <div class="panel">
     <div class="body-pad">
       <div class="subnote">
         {PIN_SVG.replace('class="pin"', 'class="subnote-pin"')}
