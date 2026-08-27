@@ -80,7 +80,7 @@ html = f"""<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>あごぱっかーん {MONTH}月 出店スケジュール</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Kalam:wght@400;700&family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Kalam:wght@400;700&family=Playfair+Display:wght@600;700&family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {{
     --bg: #F3EFE7;
@@ -122,6 +122,19 @@ html = f"""<!DOCTYPE html>
     background: linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,.55) 100%);
     pointer-events: none;
   }}
+  .tagline-en {{
+    position: absolute;
+    top: 34px;
+    left: 42px;
+    z-index: 3;
+    color: #f2e2c2;
+    font-family: 'Kalam', cursive;
+    font-size: 23px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-shadow: 2px 2px 6px rgba(0,0,0,.65);
+    transform: rotate(-2deg);
+  }}
   .title {{
     position: absolute;
     bottom: 135px;
@@ -145,29 +158,33 @@ html = f"""<!DOCTYPE html>
     gap: 16px;
   }}
   .schedule button {{
-    width: 56px;
-    height: 56px;
-    border: 0;
+    width: 52px;
+    height: 52px;
+    border: 1px solid #cda86a;
     border-radius: 50%;
-    background: #f8e6b5;
-    color: #222;
-    font-size: 34px;
-    font-weight: bold;
+    background: rgba(15,12,10,.55);
+    color: #f2e2c2;
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1;
     cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0,0,0,.25);
+    box-shadow: 0 4px 10px rgba(0,0,0,.3);
     transition: .2s;
   }}
-  .schedule button:hover {{ transform: scale(1.1); }}
+  .schedule button:hover {{ background: #cda86a; color: #1a1410; transform: scale(1.06); }}
   .schedule-title {{
-    padding: 20px 40px;
-    min-width: 400px;
+    padding: 18px 42px;
+    min-width: 380px;
     border-radius: 50px;
-    background: #126b38;
-    color: white;
+    background: rgba(15,12,10,.8);
+    border: 1px solid #cda86a;
+    color: #f2e2c2;
     text-align: center;
-    font-size: 26px;
-    font-weight: 900;
-    box-shadow: 0 6px 10px rgba(0,0,0,.25);
+    font-family: 'Playfair Display', serif;
+    font-size: 23px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.35);
   }}
 
   /* ---------- Content panel ---------- */
@@ -302,6 +319,7 @@ html = f"""<!DOCTYPE html>
   /* ---------- Mobile ---------- */
   @media (max-width: 900px) {{
     .hero {{ min-height: 220px; border-radius: 0; margin: 0 0 16px; }}
+    .tagline-en {{ top: 14px; left: 14px; font-size: 13px; }}
     .title {{ bottom: 70px; right: 15px; font-size: 34px; letter-spacing: -2px; }}
     .schedule {{ bottom: 20px; left: 10px; right: 15px; justify-content: center; gap: 6px; }}
     .schedule-title {{ min-width: 0; padding: 10px 18px; font-size: 14px; }}
@@ -333,6 +351,8 @@ html = f"""<!DOCTYPE html>
 </head>
 <body>
   <section class="hero">
+    <div class="tagline-en">Burgers &times; Palms, Forever.</div>
+
     <h1 class="title">あごぱっかーん</h1>
 
     <div class="schedule">
