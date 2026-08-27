@@ -8,17 +8,8 @@ from config import GOOGLE_CALENDAR_API_KEY, GOOGLE_CALENDAR_ID
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-with open(os.path.join(SCRIPT_DIR, "assets", "top_b64.txt")) as f:
-    TOP_LOGO_B64 = f.read().strip()
-
 with open(os.path.join(SCRIPT_DIR, "assets", "hero_bg_b64.txt")) as f:
     HERO_BG_B64 = f.read().strip()
-
-with open(os.path.join(SCRIPT_DIR, "assets", "photo1_b64.txt")) as f:
-    PHOTO1_B64 = f.read().strip()
-
-with open(os.path.join(SCRIPT_DIR, "assets", "photo2_b64.txt")) as f:
-    PHOTO2_B64 = f.read().strip()
 
 YEAR, MONTH = 2026, 8
 WEEKDAY_JP = ["日", "月", "火", "水", "木", "金", "土"]
@@ -115,7 +106,7 @@ html = f"""<!DOCTYPE html>
     position: relative;
     width: 100%;
     max-width: 1100px;
-    min-height: 800px;
+    min-height: 420px;
     margin: 30px auto;
     overflow: hidden;
     background-image: url("data:image/jpeg;base64,{HERO_BG_B64}");
@@ -131,91 +122,18 @@ html = f"""<!DOCTYPE html>
     background: linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,.55) 100%);
     pointer-events: none;
   }}
-  .catch {{
-    position: absolute;
-    top: 40px;
-    left: 45px;
-    color: #f8e6b5;
-    font-family: 'Kalam', cursive;
-    font-size: 32px;
-    font-weight: bold;
-    text-shadow: 2px 2px 6px rgba(0,0,0,.6);
-    transform: rotate(-3deg);
-    z-index: 3;
-  }}
-  .stars {{
-    margin-top: 8px;
-    color: #ff6b4d;
-    font-size: 24px;
-    letter-spacing: 8px;
-  }}
-  .avatar {{
-    position: absolute;
-    top: 20px;
-    right: 310px;
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    background: #f6d36c;
-    border: 14px solid #f8e6b5;
-    overflow: hidden;
-    z-index: 5;
-  }}
-  .avatar img {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
-  .beef {{
-    position: absolute;
-    right: 35px;
-    top: 35px;
-    z-index: 5;
-    padding: 18px 30px;
-    color: #8e2618;
-    background: #f5d47c;
-    border: 5px solid #8e2618;
-    font-size: 25px;
-    font-weight: 900;
-    transform: rotate(-7deg);
-    text-align: center;
-  }}
-  .burger {{
-    position: absolute;
-    left: -30px;
-    bottom: -40px;
-    width: 57%;
-    max-width: 850px;
-    z-index: 2;
-    filter: drop-shadow(12px 18px 12px rgba(0,0,0,.35));
-  }}
-  .burger img {{ display: block; width: 100%; height: auto; border-radius: 20px; }}
   .title {{
     position: absolute;
-    top: 340px;
+    bottom: 135px;
     right: 50px;
     z-index: 5;
     margin: 0;
     color: #fff8ec;
-    font-size: clamp(45px, 6vw, 90px);
+    font-size: clamp(50px, 7vw, 100px);
     font-weight: 900;
     letter-spacing: -4px;
     text-shadow: 4px 4px 0 rgba(0,0,0,.55), 0 0 22px rgba(255,180,60,.5);
     white-space: nowrap;
-  }}
-  .burger-time {{
-    position: absolute;
-    right: 50px;
-    top: 450px;
-    z-index: 5;
-    min-width: 360px;
-    padding: 16px 32px;
-    background: #bd2419;
-    color: white;
-    text-align: center;
-    font-size: 22px;
-    font-weight: 900;
-    letter-spacing: 2px;
-    transform: rotate(-2deg);
-    border: 5px solid #f8e6b5;
-    box-shadow: 0 6px 0 rgba(100,30,0,.35);
-    clip-path: polygon(3% 0, 97% 0, 100% 50%, 97% 100%, 3% 100%, 0 50%);
   }}
   .schedule {{
     position: absolute;
@@ -383,15 +301,9 @@ html = f"""<!DOCTYPE html>
 
   /* ---------- Mobile ---------- */
   @media (max-width: 900px) {{
-    .hero {{ min-height: 350px; border-radius: 0; margin: 0 0 16px; }}
-    .catch {{ left: 15px; top: 14px; font-size: 13px; }}
-    .stars {{ font-size: 9px; }}
-    .avatar {{ width: 92px; height: 92px; top: 10px; right: 160px; border-width: 5px; }}
-    .beef {{ right: 8px; top: 10px; padding: 6px 9px; font-size: 10px; border-width: 2px; }}
-    .burger {{ left: 10px; top: 72px; bottom: auto; width: 40%; max-width: 170px; }}
-    .title {{ top: 112px; right: 15px; font-size: 30px; letter-spacing: -2px; }}
-    .burger-time {{ right: 15px; top: 165px; min-width: 0; width: 56%; padding: 6px 6px; font-size: 11px; border-width: 2px; }}
-    .schedule {{ top: 292px; bottom: auto; left: 10px; right: 15px; justify-content: center; gap: 6px; }}
+    .hero {{ min-height: 220px; border-radius: 0; margin: 0 0 16px; }}
+    .title {{ bottom: 70px; right: 15px; font-size: 34px; letter-spacing: -2px; }}
+    .schedule {{ bottom: 20px; left: 10px; right: 15px; justify-content: center; gap: 6px; }}
     .schedule-title {{ min-width: 0; padding: 10px 18px; font-size: 14px; }}
     .schedule button {{ width: 38px; height: 38px; font-size: 20px; }}
   }}
@@ -421,21 +333,7 @@ html = f"""<!DOCTYPE html>
 </head>
 <body>
   <section class="hero">
-    <div class="catch">
-      Always<br>
-      Fresh &amp; Delicious!
-      <div class="stars">★ ★ ★</div>
-    </div>
-
-    <div class="avatar"><img src="data:image/jpeg;base64,{TOP_LOGO_B64}" alt="あごぱっかーん"></div>
-
-    <div class="beef">100% BEEF<br>100% SMILE.</div>
-
-    <div class="burger"><img src="data:image/jpeg;base64,{PHOTO1_B64}" alt="あごぱっかーんバーガー"></div>
-
     <h1 class="title">あごぱっかーん</h1>
-
-    <div class="burger-time">★ BURGER TIME! ★</div>
 
     <div class="schedule">
       <button type="button" id="prevMonthBtn" aria-label="前の月">‹</button>
