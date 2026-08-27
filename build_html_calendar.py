@@ -83,15 +83,17 @@ html = f"""<!DOCTYPE html>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Kalam:wght@400;700&family=Playfair+Display:wght@600;700&family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {{
-    --bg: #F3EFE7;
+    --bg: #EEECE8;
     --ink: #241A10;
     --gray: #767676;
-    --line: #EAEAEA;
-    --accent: #FF5A1F;
-    --sat: #2563EB;
-    --green: #23814B;
-    --grad-bottom: #FF9A1E;
-    --schedule-bg: #FFF7DC;
+    --line: #E2DFD8;
+    --accent: #8B6A2F;
+    --sat: #2C4A6E;
+    --green: #C9A86A;
+    --gold: #C9A86A;
+    --charcoal: #17130F;
+    --grad-bottom: #17130F;
+    --schedule-bg: #F6F4EF;
   }}
   * {{ box-sizing: border-box; }}
   body {{
@@ -207,7 +209,7 @@ html = f"""<!DOCTYPE html>
     text-align: left;
     font-size: 15px;
     color: var(--gray);
-    background: #FAFAFA;
+    background: #F6F4EF;
     border: 1px solid var(--line);
     border-radius: 10px;
     padding: 14px 16px;
@@ -241,7 +243,7 @@ html = f"""<!DOCTYPE html>
     margin-bottom: 9px;
     border-bottom: 1px solid var(--line);
   }}
-  .day-card-head .daynum.sun {{ color: #E2402D; }}
+  .day-card-head .daynum.sun {{ color: #8B3A3A; }}
   .day-card-head .daynum.sat {{ color: var(--sat); }}
   .day-card-head .wd {{
     font-size: 11px;
@@ -288,7 +290,8 @@ html = f"""<!DOCTYPE html>
   .footer-bar {{
     margin-top: 24px;
     background: var(--grad-bottom);
-    color: #fff;
+    border-top: 1px solid rgba(201,168,106,.4);
+    color: #f2e2c2;
     padding: 16px 20px;
     display: flex;
     align-items: center;
@@ -306,6 +309,7 @@ html = f"""<!DOCTYPE html>
     font-family: 'Kalam', cursive;
     font-weight: 700;
     font-size: 14px;
+    color: #cda86a;
   }}
   .footnotes {{
     font-size: 10.5px;
