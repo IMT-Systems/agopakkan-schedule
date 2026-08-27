@@ -108,7 +108,7 @@ html = f"""<!DOCTYPE html>
     position: relative;
     width: 100%;
     max-width: 1100px;
-    min-height: 420px;
+    min-height: 320px;
     margin: 30px auto;
     overflow: hidden;
     background-image: url("data:image/jpeg;base64,{HERO_BG_B64}");
@@ -136,19 +136,6 @@ html = f"""<!DOCTYPE html>
     letter-spacing: 0.5px;
     text-shadow: 2px 2px 6px rgba(0,0,0,.65);
     transform: rotate(-2deg);
-  }}
-  .title {{
-    position: absolute;
-    bottom: 135px;
-    right: 50px;
-    z-index: 5;
-    margin: 0;
-    color: #fff8ec;
-    font-size: clamp(50px, 7vw, 100px);
-    font-weight: 900;
-    letter-spacing: -4px;
-    text-shadow: 4px 4px 0 rgba(0,0,0,.55), 0 0 22px rgba(255,180,60,.5);
-    white-space: nowrap;
   }}
   .schedule {{
     position: absolute;
@@ -322,9 +309,8 @@ html = f"""<!DOCTYPE html>
 
   /* ---------- Mobile ---------- */
   @media (max-width: 900px) {{
-    .hero {{ min-height: 220px; border-radius: 0; margin: 0 0 16px; }}
+    .hero {{ min-height: 170px; border-radius: 0; margin: 0 0 16px; }}
     .tagline-en {{ top: 14px; left: 14px; font-size: 13px; }}
-    .title {{ bottom: 70px; right: 15px; font-size: 34px; letter-spacing: -2px; }}
     .schedule {{ bottom: 20px; left: 10px; right: 15px; justify-content: center; gap: 6px; }}
     .schedule-title {{ min-width: 0; padding: 10px 18px; font-size: 14px; }}
     .schedule button {{ width: 38px; height: 38px; font-size: 20px; }}
@@ -356,8 +342,6 @@ html = f"""<!DOCTYPE html>
 <body>
   <section class="hero">
     <div class="tagline-en">Burgers &times; Palms, Forever.</div>
-
-    <h1 class="title">あごぱっかーん</h1>
 
     <div class="schedule">
       <button type="button" id="prevMonthBtn" aria-label="前の月">‹</button>
