@@ -11,6 +11,9 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(SCRIPT_DIR, "assets", "top_b64.txt")) as f:
     TOP_LOGO_B64 = f.read().strip()
 
+with open(os.path.join(SCRIPT_DIR, "assets", "hero_bg_b64.txt")) as f:
+    HERO_BG_B64 = f.read().strip()
+
 with open(os.path.join(SCRIPT_DIR, "assets", "photo1_b64.txt")) as f:
     PHOTO1_B64 = f.read().strip()
 
@@ -115,7 +118,9 @@ html = f"""<!DOCTYPE html>
     min-height: 800px;
     margin: 30px auto;
     overflow: hidden;
-    background: linear-gradient(135deg, #d87513 0%, #f7b82a 45%, #ffe14d 100%);
+    background-image: url("data:image/jpeg;base64,{HERO_BG_B64}");
+    background-size: cover;
+    background-position: center;
     border-radius: 28px;
     box-shadow: 0 10px 30px rgba(0,0,0,.18);
   }}
@@ -123,33 +128,24 @@ html = f"""<!DOCTYPE html>
     content: "";
     position: absolute;
     inset: 0;
-    background: repeating-conic-gradient(from -10deg, rgba(255,255,255,.08) 0deg 12deg, transparent 12deg 30deg);
-    opacity: .7;
-    pointer-events: none;
-  }}
-  .hero::after {{
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(rgba(80,40,0,.18) 1px, transparent 1px);
-    background-size: 6px 6px;
-    opacity: .25;
+    background: linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,.55) 100%);
     pointer-events: none;
   }}
   .catch {{
     position: absolute;
     top: 40px;
     left: 45px;
-    color: #214d28;
+    color: #f8e6b5;
     font-family: 'Kalam', cursive;
     font-size: 32px;
     font-weight: bold;
+    text-shadow: 2px 2px 6px rgba(0,0,0,.6);
     transform: rotate(-3deg);
     z-index: 3;
   }}
   .stars {{
     margin-top: 8px;
-    color: #c92e1f;
+    color: #ff6b4d;
     font-size: 24px;
     letter-spacing: 8px;
   }}
@@ -196,11 +192,11 @@ html = f"""<!DOCTYPE html>
     right: 50px;
     z-index: 5;
     margin: 0;
-    color: #7d2016;
+    color: #fff8ec;
     font-size: clamp(45px, 6vw, 90px);
     font-weight: 900;
     letter-spacing: -4px;
-    text-shadow: 4px 4px 0 #f8e6b5, 7px 7px 0 rgba(100,30,0,.35);
+    text-shadow: 4px 4px 0 rgba(0,0,0,.55), 0 0 22px rgba(255,180,60,.5);
     white-space: nowrap;
   }}
   .burger-time {{
