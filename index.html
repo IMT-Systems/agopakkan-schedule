@@ -232,6 +232,22 @@
     padding: 0 30px 24px;
   }
 
+  /* ---------- ForeAct brand signature (all screens, fixed bottom-right) ---------- */
+  .foreact-brand {
+    position: fixed;
+    right: max(14px, env(safe-area-inset-right, 0px));
+    bottom: max(14px, env(safe-area-inset-bottom, 0px));
+    z-index: 2147483000;
+    font-family: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    line-height: 1;
+    color: rgba(30, 20, 8, 0.38);
+    pointer-events: none;
+    user-select: none;
+  }
+
   /* ---------- Mobile ---------- */
   @media (max-width: 900px) {
     .hero { min-height: 170px; border-radius: 0; margin: 0 0 16px; }
@@ -298,6 +314,8 @@
       天候や状況により、変更・中止となる場合がございます。最新情報はSNSをご確認ください。
     </div>
   </div>
+
+  <div class="foreact-brand">ForeAct</div>
 
   <script>
   // ---------------------------------------------------------------
