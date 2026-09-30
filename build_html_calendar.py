@@ -539,6 +539,11 @@ html = f"""<!DOCTYPE html>
     }}).format(new Date()); // "YYYY-MM-DD"
   }}
 
+  function nowYearMonthJst() {{
+    var parts = todayJst().split("-"); // ["YYYY", "MM", "DD"]
+    return {{ year: parseInt(parts[0], 10), month: parseInt(parts[1], 10) }};
+  }}
+
   function cacheKey(year, month) {{
     return "agopakkan_cache_" + year + "-" + pad2(month);
   }}
@@ -606,10 +611,12 @@ html = f"""<!DOCTYPE html>
   document.getElementById("prevMonthBtn").addEventListener("click", prevMonth);
   document.getElementById("nextMonthBtn").addEventListener("click", nextMonth);
 
-  // 初回表示はサーバー側で生成済みのHTML（{MONTH}月）をそのまま使い、
-  // ちらつきを避けつつGoogleカレンダーの最新情報だけを上書き取得します。
+  // 初回表示は「ページを開いた時点」のJST基準の年月にします。
+  // サーバー側で生成済みのHTML（{MONTH}月分のフォールバック）は、
+  // 今月がその月と一致する場合はそのまま、異なる場合は今月の表示に切り替えます。
   document.addEventListener("DOMContentLoaded", function() {{
-    refreshForMonth(currentYear, currentMonth);
+    var now = nowYearMonthJst();
+    loadMonth(now.year, now.month);
   }});
   </script>
 </body>
