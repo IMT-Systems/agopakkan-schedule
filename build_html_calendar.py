@@ -310,7 +310,7 @@ html = f"""<!DOCTYPE html>
   /* ---------- ForeAct brand signature (all screens, fixed bottom-right) ---------- */
   .foreact-brand {{
     position: fixed;
-    right: max(14px, env(safe-area-inset-right, 0px));
+    right: calc(34px + env(safe-area-inset-right, 0px));
     bottom: max(14px, env(safe-area-inset-bottom, 0px));
     z-index: 2147483000;
     font-family: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
