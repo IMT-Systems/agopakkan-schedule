@@ -22,6 +22,15 @@ PIN_SVG = (
     '</svg>'
 )
 
+FLYER_SVG = (
+    '<svg class="flyer-icon" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">'
+    '<path d="M6 2h9l4 4v16H6V2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>'
+    '<path d="M15 2v4h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>'
+    '<line x1="9" y1="12" x2="17" y2="12" stroke="currentColor" stroke-width="1.6"/>'
+    '<line x1="9" y1="16" x2="17" y2="16" stroke="currentColor" stroke-width="1.6"/>'
+    '</svg>'
+)
+
 def maps_url(query):
     return f"https://www.google.com/maps/search/?api=1&query={quote(query)}"
 
@@ -34,10 +43,15 @@ def day_card_html(day, wd_label, wd_idx, events):
             f'<a class="place-link" href="{link}" target="_blank" rel="noopener">{PIN_SVG}<span>{e["name"]}</span></a>'
             if link else f'<span class="place-link plain">{e["name"]}</span>'
         )
+        flyer_html = (
+            f'<a class="flyer-link" href="{e["flyer"]}" target="_blank" rel="noopener" aria-label="チラシを見る">{FLYER_SVG}</a>'
+            if e.get("flyer") else ""
+        )
         rows += (
             f'<div class="event-row">'
             f'<span class="time">{e["time"]}</span>'
             f'{place_html}'
+            f'{flyer_html}'
             f'</div>'
         )
     return (
@@ -64,7 +78,7 @@ if not schedule_html:
 FALLBACK_EVENTS_JSON = json.dumps(
     {
         str(day): [
-            {"name": e["name"], "time": e["time"], "maps": e.get("maps", "")}
+            {"name": e["name"], "time": e["time"], "maps": e.get("maps", ""), "flyer": e.get("flyer", "")}
             for e in evs
             if not e.get("deco_only")
         ]
@@ -266,6 +280,15 @@ html = f"""<!DOCTYPE html>
   .place-link .pin {{ flex: 0 0 auto; margin-top: 3px; color: var(--green); }}
   a.place-link:hover span {{ color: var(--accent); text-decoration: underline; }}
   .place-link.plain {{ color: var(--gray); font-weight: 400; }}
+  .flyer-link {{
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    align-self: center;
+    color: var(--green);
+  }}
+  .flyer-link:hover {{ color: var(--accent); }}
+  .flyer-icon {{ display: block; }}
   .empty-state {{
     text-align: center;
     color: var(--gray);
@@ -425,6 +448,14 @@ html = f"""<!DOCTYPE html>
       + '<circle cx="12" cy="9" r="2.2" fill="currentColor"/></svg>';
   }}
 
+  function flyerSvg() {{
+    return '<svg class="flyer-icon" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">'
+      + '<path d="M6 2h9l4 4v16H6V2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>'
+      + '<path d="M15 2v4h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>'
+      + '<line x1="9" y1="12" x2="17" y2="12" stroke="currentColor" stroke-width="1.6"/>'
+      + '<line x1="9" y1="16" x2="17" y2="16" stroke="currentColor" stroke-width="1.6"/></svg>';
+  }}
+
   function escapeHtml(s) {{
     return String(s).replace(/[&<>"']/g, function(c) {{
       return {{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}}[c];
@@ -454,11 +485,17 @@ html = f"""<!DOCTYPE html>
     }} else {{
       return null;
     }}
+    var flyerUrl = null;
+    if (ev.description) {{
+      var fm = ev.description.match(/https?:\/\/\S+/);
+      if (fm) flyerUrl = fm[0].replace(/[),.、。」』]+$/, "");
+    }}
     return {{
       day: day,
       name: ev.summary || "(無題の予定)",
       time: timeLabel,
-      mapsQuery: ev.location || ev.summary || ""
+      mapsQuery: ev.location || ev.summary || "",
+      flyerUrl: flyerUrl
     }};
   }}
 
@@ -483,7 +520,10 @@ html = f"""<!DOCTYPE html>
         var placeHtml = link
           ? '<a class="place-link" href="' + link + '" target="_blank" rel="noopener">' + pinSvg() + '<span>' + escapeHtml(e.name) + '</span></a>'
           : '<span class="place-link plain">' + escapeHtml(e.name) + '</span>';
-        rows += '<div class="event-row"><span class="time">' + escapeHtml(e.time) + '</span>' + placeHtml + '</div>';
+        var flyerHtml = e.flyerUrl
+          ? '<a class="flyer-link" href="' + e.flyerUrl + '" target="_blank" rel="noopener" aria-label="チラシを見る">' + flyerSvg() + '</a>'
+          : '';
+        rows += '<div class="event-row"><span class="time">' + escapeHtml(e.time) + '</span>' + placeHtml + flyerHtml + '</div>';
       }});
       html += '<div class="day-card">'
         + '<div class="day-card-head"><span class="daynum ' + numCls + '">' + pad2(day) + '</span><span class="wd">(' + wd + ')</span></div>'
@@ -506,7 +546,7 @@ html = f"""<!DOCTYPE html>
       var byDay = {{}};
       Object.keys(FALLBACK_EVENTS).forEach(function(d) {{
         byDay[d] = FALLBACK_EVENTS[d].map(function(e) {{
-          return {{ name: e.name, time: e.time, mapsQuery: e.maps || e.name }};
+          return {{ name: e.name, time: e.time, mapsQuery: e.maps || e.name, flyerUrl: e.flyer || null }};
         }});
       }});
       renderSchedule(year, month, byDay);
