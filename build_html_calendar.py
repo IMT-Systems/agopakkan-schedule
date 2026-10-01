@@ -486,7 +486,11 @@ html = f"""<!DOCTYPE html>
       return null;
     }}
     var flyerUrl = null;
-    if (ev.description) {{
+    if (ev.attachments && ev.attachments.length && ev.attachments[0].fileUrl) {{
+      // Googleカレンダーの「添付ファイル」機能でDriveのファイルを直接添付した場合
+      flyerUrl = ev.attachments[0].fileUrl;
+    }} else if (ev.description) {{
+      // もしくは詳細欄に直接貼られたURL
       var fm = ev.description.match(/https?:\/\/\S+/);
       if (fm) flyerUrl = fm[0].replace(/[),.、。」』]+$/, "");
     }}
