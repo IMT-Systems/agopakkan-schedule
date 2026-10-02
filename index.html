@@ -18,7 +18,7 @@
     --gold: #C9A86A;
     --charcoal: #17130F;
     --grad-bottom: #17130F;
-    --schedule-bg: #F6F4EF;
+    --schedule-bg: #FBF2DC;
   }
   * { box-sizing: border-box; }
   body {
@@ -137,7 +137,7 @@
 
   /* ---------- Schedule list (1 card per day) ---------- */
   .day-card {
-    border: 1px solid var(--line);
+    border: 1px solid rgba(201, 168, 106, .4);
     border-radius: 14px;
     background: var(--schedule-bg);
     padding: 14px 18px;
@@ -217,7 +217,7 @@
   }
 
   /* ---------- Past events (muted) & "today" divider ---------- */
-  .day-card.past { background: #EDEAE4; border-color: #E2DFD8; }
+  .day-card.past { background: #E8E4DC; border-color: #D8D4C8; }
   .day-card.past .day-card-head { color: #9A9A95; border-bottom-color: #E2DFD8; }
   .day-card.past .daynum.sun,
   .day-card.past .daynum.sat { color: #9A9A95; }
@@ -482,7 +482,7 @@
     var html = "";
     days.forEach(function(day) {
       if (isCurrentMonth && !markerInserted && day >= now.day) {
-        html += '<div class="today-marker"><span class="today-marker-label">TODAY &middot; ' + month + '/' + now.day + '</span></div>';
+        html += '<div class="today-marker"><span class="today-marker-label">TODAY</span></div>';
         markerInserted = true;
       }
       var isPast = isPastMonth || (isCurrentMonth && day < now.day);
