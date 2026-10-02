@@ -216,6 +216,47 @@
     padding: 40px 0;
   }
 
+  /* ---------- Past events (muted) & "today" divider ---------- */
+  .day-card.past { background: #EDEAE4; border-color: #E2DFD8; }
+  .day-card.past .day-card-head { color: #9A9A95; border-bottom-color: #E2DFD8; }
+  .day-card.past .daynum.sun,
+  .day-card.past .daynum.sat { color: #9A9A95; }
+  .day-card.past .wd { color: #B5B5AE; }
+  .day-card.past .event-row .time { color: #B5B5AE; }
+  .day-card.past .event-row + .event-row { border-top-color: #E2DFD8; }
+  .day-card.past .place-link { color: #9A9A95; }
+  .day-card.past .place-link .pin { color: #B5AE98; }
+  .day-card.past a.place-link:hover span { color: #9A9A95; text-decoration: none; }
+  .day-card.past .place-link.plain { color: #B5B5AE; }
+  .day-card.past .flyer-link { color: #B5AE98; border-color: #D8D4C8; background: rgba(154,154,149,.08); }
+  .day-card.past .flyer-link:hover { background: #B5AE98; border-color: #B5AE98; color: #fff; }
+
+  .today-marker {
+    display: flex;
+    align-items: center;
+    margin: 18px 0;
+  }
+  .today-marker::before,
+  .today-marker::after {
+    content: "";
+    flex: 1 1 auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,106,.6));
+  }
+  .today-marker::after { background: linear-gradient(90deg, rgba(201,168,106,.6), transparent); }
+  .today-marker-label {
+    flex: 0 0 auto;
+    margin: 0 10px;
+    padding: 5px 16px;
+    border-radius: 20px;
+    background: var(--green);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    white-space: nowrap;
+  }
+
   /* ---------- Footer (poster style) ---------- */
   .footer-bar {
     margin-top: 24px;
@@ -432,8 +473,18 @@
       return '<div class="empty-state">この月の出店予定はまだありません。</div>';
     }
 
+    var now = nowYearMonthJst();
+    var isCurrentMonth = (year === now.year && month === now.month);
+    var isPastMonth = (year < now.year) || (year === now.year && month < now.month);
+    var markerInserted = false;
+
     var html = "";
     days.forEach(function(day) {
+      if (isCurrentMonth && !markerInserted && day >= now.day) {
+        html += '<div class="today-marker"><span class="today-marker-label">本日 ' + month + '/' + now.day + '</span></div>';
+        markerInserted = true;
+      }
+      var isPast = isPastMonth || (isCurrentMonth && day < now.day);
       var wdIdx = new Date(year, month - 1, day).getDay();
       var wd = WD_JP[wdIdx];
       var numCls = wdIdx === 0 ? "sun" : (wdIdx === 6 ? "sat" : "");
@@ -448,7 +499,7 @@
           : '';
         rows += '<div class="event-row"><span class="time">' + escapeHtml(e.time) + '</span>' + placeHtml + flyerHtml + '</div>';
       });
-      html += '<div class="day-card">'
+      html += '<div class="day-card' + (isPast ? ' past' : '') + '">'
         + '<div class="day-card-head"><span class="daynum ' + numCls + '">' + pad2(day) + '</span><span class="wd">(' + wd + ')</span></div>'
         + '<div class="day-card-body">' + rows + '</div>'
         + '</div>';
@@ -504,7 +555,7 @@
 
   function nowYearMonthJst() {
     var parts = todayJst().split("-"); // ["YYYY", "MM", "DD"]
-    return { year: parseInt(parts[0], 10), month: parseInt(parts[1], 10) };
+    return { year: parseInt(parts[0], 10), month: parseInt(parts[1], 10), day: parseInt(parts[2], 10) };
   }
 
   function cacheKey(year, month) {
