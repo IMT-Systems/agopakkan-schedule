@@ -336,13 +336,14 @@ html = f"""<!DOCTYPE html>
   .today-marker-label {{
     flex: 0 0 auto;
     margin: 0 10px;
-    padding: 5px 16px;
+    padding: 5px 18px;
     border-radius: 20px;
     background: var(--green);
     color: #fff;
-    font-size: 11px;
+    font-family: 'Playfair Display', serif;
+    font-size: 12px;
     font-weight: 700;
-    letter-spacing: .5px;
+    letter-spacing: 2px;
     white-space: nowrap;
   }}
 
@@ -570,7 +571,7 @@ html = f"""<!DOCTYPE html>
     var html = "";
     days.forEach(function(day) {{
       if (isCurrentMonth && !markerInserted && day >= now.day) {{
-        html += '<div class="today-marker"><span class="today-marker-label">本日 ' + month + '/' + now.day + '</span></div>';
+        html += '<div class="today-marker"><span class="today-marker-label">TODAY &middot; ' + month + '/' + now.day + '</span></div>';
         markerInserted = true;
       }}
       var isPast = isPastMonth || (isCurrentMonth && day < now.day);
