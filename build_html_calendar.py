@@ -43,9 +43,16 @@ def day_card_html(day, wd_label, wd_idx, events):
             f'<a class="place-link" href="{link}" target="_blank" rel="noopener">{PIN_SVG}<span>{e["name"]}</span></a>'
             if link else f'<span class="place-link plain">{e["name"]}</span>'
         )
+        flyers = e.get("flyer") or []
+        if isinstance(flyers, str):
+            flyers = [flyers]
         flyer_html = (
-            f'<a class="flyer-link" href="{e["flyer"]}" target="_blank" rel="noopener">{FLYER_SVG}<span>チラシ</span></a>'
-            if e.get("flyer") else ""
+            '<span class="flyer-group">' + "".join(
+                f'<a class="flyer-link" href="{u}" target="_blank" rel="noopener">{FLYER_SVG}'
+                f'<span>{"チラシ" + str(i + 1) if len(flyers) > 1 else "チラシ"}</span></a>'
+                for i, u in enumerate(flyers)
+            ) + '</span>'
+            if flyers else ""
         )
         rows += (
             f'<div class="event-row">'
@@ -298,6 +305,7 @@ html = f"""<!DOCTYPE html>
   }}
   .flyer-link:hover {{ background: var(--green); border-color: var(--green); color: #fff; }}
   .flyer-icon {{ display: block; flex: 0 0 auto; }}
+  .flyer-group {{ display: inline-flex; flex-wrap: wrap; align-self: center; gap: 6px; }}
   .empty-state {{
     text-align: center;
     color: var(--gray);
@@ -535,21 +543,23 @@ html = f"""<!DOCTYPE html>
     }} else {{
       return null;
     }}
-    var flyerUrl = null;
-    if (ev.attachments && ev.attachments.length && ev.attachments[0].fileUrl) {{
-      // Googleカレンダーの「添付ファイル」機能でDriveのファイルを直接添付した場合
-      flyerUrl = ev.attachments[0].fileUrl;
-    }} else if (ev.description) {{
-      // もしくは詳細欄に直接貼られたURL
-      var fm = ev.description.match(/https?:\/\/\S+/);
-      if (fm) flyerUrl = fm[0].replace(/[),.、。」』]+$/, "");
+    var flyerUrls = [];
+    if (ev.attachments && ev.attachments.length) {{
+      // Googleカレンダーの「添付ファイル」機能でDriveのファイルを直接添付した場合（複数可）
+      ev.attachments.forEach(function(a) {{ if (a.fileUrl) flyerUrls.push(a.fileUrl); }});
+    }}
+    if (!flyerUrls.length && ev.description) {{
+      // もしくは詳細欄に直接貼られたURL（複数可）
+      (ev.description.match(/https?:\/\/\S+/g) || []).forEach(function(u) {{
+        flyerUrls.push(u.replace(/[),.、。」』]+$/, ""));
+      }});
     }}
     return {{
       day: day,
       name: ev.summary || "(無題の予定)",
       time: timeLabel,
       mapsQuery: ev.location || ev.summary || "",
-      flyerUrl: flyerUrl
+      flyerUrls: flyerUrls
     }};
   }}
 
@@ -584,8 +594,13 @@ html = f"""<!DOCTYPE html>
         var placeHtml = link
           ? '<a class="place-link" href="' + link + '" target="_blank" rel="noopener">' + pinSvg() + '<span>' + escapeHtml(e.name) + '</span></a>'
           : '<span class="place-link plain">' + escapeHtml(e.name) + '</span>';
-        var flyerHtml = e.flyerUrl
-          ? '<a class="flyer-link" href="' + e.flyerUrl + '" target="_blank" rel="noopener">' + flyerSvg() + '<span>チラシ</span></a>'
+        // 旧形式のキャッシュ（flyerUrl: 文字列）にも対応
+        var urls = e.flyerUrls || (e.flyerUrl ? [e.flyerUrl] : []);
+        var flyerHtml = urls.length
+          ? '<span class="flyer-group">' + urls.map(function(u, i) {{
+              var label = urls.length > 1 ? 'チラシ' + (i + 1) : 'チラシ';
+              return '<a class="flyer-link" href="' + escapeHtml(u) + '" target="_blank" rel="noopener">' + flyerSvg() + '<span>' + label + '</span></a>';
+            }}).join('') + '</span>'
           : '';
         rows += '<div class="event-row"><span class="time">' + escapeHtml(e.time) + '</span>' + placeHtml + flyerHtml + '</div>';
       }});
@@ -610,7 +625,7 @@ html = f"""<!DOCTYPE html>
       var byDay = {{}};
       Object.keys(FALLBACK_EVENTS).forEach(function(d) {{
         byDay[d] = FALLBACK_EVENTS[d].map(function(e) {{
-          return {{ name: e.name, time: e.time, mapsQuery: e.maps || e.name, flyerUrl: e.flyer || null }};
+          return {{ name: e.name, time: e.time, mapsQuery: e.maps || e.name, flyerUrls: [].concat(e.flyer || []) }};
         }});
       }});
       renderSchedule(year, month, byDay);
